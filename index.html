@@ -1,0 +1,106 @@
+<!doctype html>
+<html class="no-js" lang="de">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>2Rad Wächter Köln – Bike- & Scooter-Sharing im Überblick</title>
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('2rad-theme');
+        var theme = stored || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+  <meta name="description"
+    content="Alle Bike- und eScooter-Sharing-Anbieter in Köln auf einen Blick – mit aktueller Anzahl verfügbarer Fahrzeuge.">
+
+  <meta property="og:title" content="2Rad Wächter Köln">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://2rad.waechter.koeln">
+  <meta property="og:image" content="/img/logo-512.png">
+  <meta property="og:image:alt" content="2Rad Wächter Köln Logo">
+
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+  <link rel="manifest" href="site.webmanifest">
+  <meta name="theme-color" content="#ef0000" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#14171c" media="(prefers-color-scheme: dark)">
+</head>
+
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="/">
+        <img src="icon.svg" alt="" width="36" height="36">
+        <span data-i18n="siteTitle">2Rad Wächter Köln</span>
+      </a>
+      <div class="header-controls">
+        <div class="lang-switch" role="group" aria-label="Sprache wechseln">
+          <button class="lang-btn" type="button" data-lang="de">DE</button>
+          <button class="lang-btn" type="button" data-lang="ko">Kölsch</button>
+          <button class="lang-btn" type="button" data-lang="en">EN</button>
+        </div>
+        <button class="theme-toggle" type="button" id="theme-toggle" aria-label="Farbschema wechseln" data-i18n-aria="themeToggleLabel">
+          <span class="icon-moon" aria-hidden="true">🌙</span>
+          <span class="icon-sun" aria-hidden="true">☀️</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero container">
+      <h1 data-i18n="heroTitle">Alle Sharing-Anbieter för Fahrrad un eScooter en Kölle</h1>
+      <p class="subtitle" data-i18n="heroSubtitle">
+        Jeck op Räder? Hä kriss du op ene Blick, wie vill Fahrrööder un eScooter jrad en Kölle ze han sin.
+      </p>
+      <p class="updated-at">
+        <span data-i18n="lastUpdated">Stand:</span>
+        <time id="updated-time">–</time>
+      </p>
+    </section>
+
+    <section class="totals container" aria-label="Gesamtübersicht">
+      <div class="stat-card">
+        <div class="stat-value" id="total-vehicles">–</div>
+        <div class="stat-label" data-i18n="totalVehicles">Fahrzeuge insgesamt</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="total-bikes">–</div>
+        <div class="stat-label" data-i18n="totalBikes">Fahrräder</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="total-escooters">–</div>
+        <div class="stat-label" data-i18n="totalEscooters">eScooter</div>
+      </div>
+    </section>
+
+    <section class="providers container">
+      <h2 data-i18n="providersHeading">Anbieter in Köln</h2>
+      <div id="provider-grid" class="provider-grid" aria-live="polite">
+        <!-- Provider cards are inserted via JavaScript -->
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p data-i18n="disclaimer">
+        Alle Angaben sind Dummy-Daten zu Demonstrationszwecken und ohne Gewähr.
+      </p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+
+</body>
+
+</html>
