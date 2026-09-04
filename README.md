@@ -102,7 +102,3 @@ Upload the project files as-is to any PHP-capable webspace (e.g. Plesk).
 No build step, no dependencies to install. Make sure outbound HTTP requests
 to `ip-api.com` are allowed from the server for the geolocation feature to
 work.
-
-## License
-
-All rights reserved, unless stated otherwise.
