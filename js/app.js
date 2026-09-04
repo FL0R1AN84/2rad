@@ -37,7 +37,7 @@
       themeToggleLabel: 'Farbschema wechseln'
     },
     en: {
-      siteTitle: '2Rad Wächter Cologne',
+      siteTitle: '2Wheel Guardian Cologne',
       heroTitle: 'All bike- & eScooter-sharing providers in Cologne',
       heroSubtitle: 'One overview of how many bikes and eScooters are currently available for rent in Cologne.',
       lastUpdated: 'Last updated:',
@@ -104,7 +104,7 @@
 
     var titles = {
       de: '2Rad Wächter Köln – Bike- & Scooter-Sharing im Überblick',
-      en: '2Rad Wächter Cologne – Bike & Scooter Sharing at a Glance',
+      en: '2Wheel Guardian Cologne – Bike & Scooter Sharing at a Glance',
       ko: '2Rad Wächter Kölle – Bike- & Scooter-Sharing op ene Blick'
     };
     document.title = titles[currentLang] || titles.de;
