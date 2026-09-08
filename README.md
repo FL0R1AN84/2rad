@@ -7,10 +7,12 @@ for deployment on a Plesk server.
 
 🔗 Live: [2rad.waechter.koeln](https://2rad.waechter.koeln)
 
-> **Status:** provider data is now backed by real **GBFS** (General Bikeshare
-> Feed Specification) feeds where a public one exists (KVB Rad, Call a Bike,
-> Voi, Dott). Providers without a known public feed (Donkey Republic, Lime,
-> TIER, Bolt) still use dummy numbers until a feed is found or provided.
+> **Status:** provider data is backed entirely by real **GBFS** (General
+> Bikeshare Feed Specification) feeds — this app never shows made-up
+> numbers. KVB Rad, Call a Bike, Dott, Voi and Bolt currently have live
+> feeds for Cologne; Donkey Republic, Lime and TIER don't have a known
+> public feed for Cologne yet and are shown as **"no live data available"**
+> instead of a fabricated figure until one is found or provided.
 
 ## Features
 
@@ -45,9 +47,9 @@ for deployment on a Plesk server.
 ├── css/style.css         Styles (custom properties, dark mode, layout)
 ├── js/app.js             Frontend logic: i18n, theming, data rendering
 ├── api/
-│   ├── providers.php     Provider/vehicle-count endpoint (live GBFS + dummy fallback)
+│   ├── providers.php     Provider/vehicle-count endpoint (live GBFS only)
 │   ├── geo.php           IP-based geolocation (Cologne detection)
-│   ├── config/providers.php  Per-provider GBFS feed config & dummy fallback numbers
+│   ├── config/providers.php  Per-provider GBFS feed config
 │   ├── lib/gbfs.php      Minimal GBFS client (discovery, station & free-floating counts)
 │   ├── lib/cache.php     File-based cache so feeds aren't refetched on every request
 │   └── cache/            Generated cache file (git-ignored)
@@ -62,9 +64,13 @@ for deployment on a Plesk server.
 ### `GET /api/providers.php`
 
 Returns the list of sharing providers with their vehicle counts. Each
-provider also reports `live`: `true` if the numbers come from a real GBFS
-feed (fresh or last known-good cached reading), `false` if they're the
-static dummy fallback.
+provider reports `available`: `false` if there's no working live feed for
+it (in which case `bikes`/`escooters` are `null` — never a fabricated
+number), `true` otherwise. `live` additionally distinguishes a fresh/cached
+real reading (`true`) from... well, currently `live` and `available` are
+the same, since there is no other source; `live` is kept for diagnostics
+and possible future distinction (e.g. a reading so stale it's flagged
+differently).
 
 ```json
 {
@@ -77,7 +83,18 @@ static dummy fallback.
       "bikes": 1250,
       "escooters": 0,
       "color": "#004b93",
-      "live": true
+      "live": true,
+      "available": true
+    },
+    {
+      "id": "tier",
+      "name": "TIER",
+      "types": ["escooter"],
+      "bikes": null,
+      "escooters": null,
+      "color": "#1b1b1b",
+      "live": false,
+      "available": false
     }
   ]
 }
@@ -94,23 +111,27 @@ Vehicle counts are fetched from each provider's public
 | KVB Rad | `nextbike_kg` (nextbike) | Cologne-only, station-based |
 | Call a Bike | `callabike` (mobidata-bw) | Nationwide feed, filtered to a Cologne bounding box |
 | Voi | MOBIDROM Voi Köln (preferred, needs auth), or `voi_de` (mobidata-bw) fallback | Cologne-only via MOBIDROM; nationwide+bbox-filtered otherwise; see below |
+| Bolt | MOBIDROM Bolt Köln-Bonn (needs auth) | Combined Köln+Bonn dataset, filtered to a Cologne bounding box |
 | Dott | `cologne` (ridedott.com) | Cologne-only, free-floating |
-| Donkey Republic, Lime, TIER, Bolt | – | No known public feed for Cologne yet; dummy numbers |
+| Donkey Republic, TIER | – | No known public feed for Cologne yet; reported as unavailable |
+| Lime | – | MOBIDROM's `lime-nrw` dataset exists but only covers Dortmund/Essen, not Cologne; reported as unavailable |
 
 Results are cached in `api/cache/gbfs_cache.json` for two minutes
 (`CACHE_TTL_SECONDS` in `api/lib/cache.php`) to avoid hammering upstream
 feeds, and the last known-good reading is kept and reused if a feed is
 temporarily unreachable, so the site keeps showing real (if slightly
-stale) numbers instead of falling back to dummy data.
+stale) numbers instead of showing "unavailable" during a brief outage.
 
-**MOBIDROM (NRW mobility-data agency) for Voi:** since September 2025, Voi
-publishes open, Cologne-only GBFS data via the NRW mobility-data platform
-[mobilitaetsdaten.nrw](https://www.mobilitaetsdaten.nrw) (register as a
-data consumer via "Registrieren", then find the "Voi Köln" dataset under
-Sharing Mobility for the access details). Access requires OAuth2
-client-credentials auth. Set the following environment variables to use
-it (falls back to Voi's nationwide feed, filtered to Cologne, no auth
-required, when `MOBIDROM_GBFS_CLIENT_SECRET` isn't set):
+**MOBIDROM (NRW mobility-data agency) for Voi & Bolt:** since September
+2025, Voi and Bolt publish open GBFS data via the NRW mobility-data
+platform [mobilitaetsdaten.nrw](https://www.mobilitaetsdaten.nrw) (register
+as a data consumer via "Registrieren", then find the "Voi Köln"/"Bolt
+Köln-Bonn" dataset under Sharing Mobility for the access details). Both
+use the same OAuth2 client-credentials auth and the same client id/secret.
+Set the following environment variables to use it (Voi falls back to its
+nationwide feed, filtered to Cologne, no auth required, when
+`MOBIDROM_GBFS_CLIENT_SECRET` isn't set; Bolt has no such fallback and is
+reported as unavailable instead):
 
 ```bash
 # Required — the client secret from your MOBIDROM dataset access page.
@@ -118,10 +139,11 @@ required, when `MOBIDROM_GBFS_CLIENT_SECRET` isn't set):
 # (e.g. Plesk's "Environment variables" panel), not in source control.
 export MOBIDROM_GBFS_CLIENT_SECRET="..."
 
-# Optional — defaults shown below match the current Voi Köln dataset.
+# Optional — defaults shown below match the current Voi Köln/Bolt Köln-Bonn datasets.
 export MOBIDROM_GBFS_TOKEN_URL="https://www.mobilitaetsdaten.nrw/keycloak/realms/mobidrom/protocol/openid-connect/token"
 export MOBIDROM_GBFS_CLIENT_ID="gbfs-api"
 export MOBIDROM_VOI_GBFS_URL="https://www.mobilitaetsdaten.nrw/api/systemadapter-gbfs-provider/feed/v3.0/voi-koeln/source-voi-koeln/gbfs.json"
+export MOBIDROM_BOLT_GBFS_URL="https://www.mobilitaetsdaten.nrw/api/systemadapter-gbfs-provider/feed/v3.0/bolt-koeln-bonn/source-bolt-koeln-bonn/gbfs.json"
 ```
 
 Access tokens are cached in `api/cache/oauth_tokens.json` (file permissions

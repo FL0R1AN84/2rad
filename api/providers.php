@@ -3,19 +3,20 @@
  * JSON endpoint for bike/eScooter sharing providers in Cologne.
  *
  * Live vehicle counts are fetched from each provider's public GBFS feed
- * (see api/config/providers.php) where available. Providers without a
- * known public feed keep using dummy data (documented per-provider).
+ * (see api/config/providers.php) where available. This app never shows
+ * dummy/fake numbers: providers without a working live feed are reported
+ * with bikes/escooters = null and available = false, so the frontend can
+ * show this clearly instead of pretending to have real figures.
  *
  * Resolution order per provider, so the site stays usable even if a feed
  * is slow or temporarily down:
  *   1. Fresh cached reading (within CACHE_TTL_SECONDS)
  *   2. Live GBFS fetch (cached afterwards)
  *   3. Stale cached reading (last known-good, any age)
- *   4. Static fallback numbers
+ *   4. Unavailable (bikes/escooters = null, available = false)
  *
- * Response format is unchanged so the frontend keeps working unchanged.
- * An additional "live" flag per provider tells the frontend whether the
- * figures are a real (or last known-good) reading vs. pure dummy data.
+ * An "available" flag per provider tells the frontend whether the figures
+ * are a real (or last known-good) reading vs. no data at all.
  */
 
 require __DIR__ . '/lib/gbfs.php';
@@ -117,7 +118,18 @@ foreach (get_provider_config() as $config) {
     }
 
     if ($counts === null) {
-        $counts = $config['fallback'];
+        $providers[] = [
+            'id' => $config['id'],
+            'name' => $config['name'],
+            'types' => $config['types'],
+            'bikes' => null,
+            'escooters' => null,
+            'color' => $config['color'],
+            'live' => false,
+            'available' => false,
+            'source' => $config['source']['label'] ?? null,
+        ];
+        continue;
     }
 
     $providers[] = [
@@ -128,6 +140,7 @@ foreach (get_provider_config() as $config) {
         'escooters' => $counts['escooters'],
         'color' => $config['color'],
         'live' => $isLive,
+        'available' => true,
         // Which concrete feed backed this reading (e.g. "mobidrom-cologne"
         // vs. "voi-de-nationwide"); mainly useful for diagnosing config/env
         // issues per provider. Omitted for providers without a 'label'.

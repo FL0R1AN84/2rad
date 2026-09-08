@@ -9,8 +9,8 @@
   <script>
     (function () {
       try {
-        var stored = localStorage.getItem('2rad-theme');
-        var theme = stored || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        const stored = localStorage.getItem('2rad-theme');
+        const theme = stored || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         document.documentElement.setAttribute('data-theme', theme);
       } catch (e) {}
     })();
@@ -93,8 +93,8 @@
 
   <footer class="site-footer">
     <div class="container">
-      <p data-i18n="disclaimer">
-        Alle Angaben sind Dummy-Daten zu Demonstrationszwecken und ohne Gewähr.
+      <p data-i18n="footerNote">
+        Live-Daten aus den öffentlichen GBFS-Feeds der Anbieter. Wo (noch) keine Live-Daten verfügbar sind, ist das beim jeweiligen Anbieter gekennzeichnet.
       </p>
     </div>
   </footer>

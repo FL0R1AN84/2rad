@@ -5,19 +5,39 @@
  *     1. Stored user choice (localStorage) always takes priority
  *     2. Kölsch only if the visitor's IP resolves to Cologne (geo check)
  *     3. Otherwise: German if browser/OS language is German, else English
- * - Loads provider data (currently dummy data via api/providers.php) and renders
- *   overall totals as well as individual provider cards
+ * - Loads provider data (live via api/providers.php, falling back to a
+ *   clearly marked "no live data" state per provider when none is available)
+ *   and renders overall totals as well as individual provider cards
+ */
+
+/**
+ * @typedef {Object} Provider
+ * @property {string} id
+ * @property {string} name
+ * @property {string[]} types
+ * @property {?number} bikes         null when `available` is false
+ * @property {?number} escooters     null when `available` is false
+ * @property {string} color
+ * @property {boolean} live          whether the reading is a real (or last known-good) GBFS value
+ * @property {boolean} available     whether this provider has any live data at all
+ * @property {?string} source        diagnostic label of the concrete feed used, if any
+ */
+
+/**
+ * @typedef {Object} ProviderResponse
+ * @property {string} updated
+ * @property {Provider[]} providers
  */
 
 (function () {
   'use strict';
 
-  var STORAGE_KEY = '2rad-lang';
-  var DATA_URL = 'api/providers.php';
-  var GEO_URL = 'api/geo.php';
-  var SUPPORTED_LANGS = ['de', 'en', 'ko'];
+  const STORAGE_KEY = '2rad-lang';
+  const DATA_URL = 'api/providers.php';
+  const GEO_URL = 'api/geo.php';
+  const SUPPORTED_LANGS = ['de', 'en', 'ko'];
 
-  var translations = {
+  const translations = {
     de: {
       siteTitle: '2Rad Wächter Köln',
       heroTitle: 'Alle Bike- & eScooter-Sharing-Anbieter in Köln',
@@ -27,7 +47,8 @@
       totalBikes: 'Fahrräder',
       totalEscooters: 'eScooter',
       providersHeading: 'Anbieter in Köln',
-      disclaimer: 'Alle Angaben sind Dummy-Daten zu Demonstrationszwecken und ohne Gewähr.',
+      footerNote: 'Live-Daten aus den öffentlichen GBFS-Feeds der Anbieter. Wo (noch) keine Live-Daten verfügbar sind, ist das beim jeweiligen Anbieter gekennzeichnet.',
+      noDataLabel: 'Keine Live-Daten verfügbar',
       typeBike: 'Fahrrad',
       typeEscooter: 'eScooter',
       bikesLabel: 'Räder',
@@ -45,7 +66,8 @@
       totalBikes: 'Bikes',
       totalEscooters: 'eScooters',
       providersHeading: 'Providers in Cologne',
-      disclaimer: 'All figures are dummy data for demonstration purposes and provided without guarantee.',
+      footerNote: 'Live data from each provider\'s public GBFS feed. Providers without live data (yet) are clearly marked as such.',
+      noDataLabel: 'No live data available',
       typeBike: 'Bike',
       typeEscooter: 'eScooter',
       bikesLabel: 'Bikes',
@@ -63,7 +85,8 @@
       totalBikes: 'Fahrrööder',
       totalEscooters: 'eScooter',
       providersHeading: 'Anbieter en Kölle',
-      disclaimer: 'Alle Zahle sin Dummy-Date för Demonstrationszwecke un ohne Jewähr.',
+      footerNote: 'Live-Date us de öffentliche GBFS-Feeds vun de Anbieter. Wo (noch) kein Live-Date do sin, steiht dat bei däm Anbieter drusse.',
+      noDataLabel: 'Kein Live-Date do',
       typeBike: 'Fahrrad',
       typeEscooter: 'eScooter',
       bikesLabel: 'Rääder',
@@ -79,21 +102,24 @@
   }
 
   function detectBrowserLang() {
-    var navLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
-    var navLangs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navLang];
-    var isGerman = navLangs.some(function (l) { return (l || '').toLowerCase().indexOf('de') === 0; });
+    // navigator.userLanguage is deprecated/IE-only; kept purely as a last-resort
+    // fallback for very old browsers where navigator.language is unavailable.
+    // noinspection JSDeprecatedSymbols
+    const navLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+    const navLangs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navLang];
+    const isGerman = navLangs.some(function (l) { return (l || '').toLowerCase().indexOf('de') === 0; });
     return isGerman ? 'de' : 'en';
   }
 
-  var currentLang = normalizeLang(localStorage.getItem(STORAGE_KEY)) || detectBrowserLang();
-  var userHasChosen = !!normalizeLang(localStorage.getItem(STORAGE_KEY));
+  let currentLang = normalizeLang(localStorage.getItem(STORAGE_KEY)) || detectBrowserLang();
+  let userHasChosen = !!normalizeLang(localStorage.getItem(STORAGE_KEY));
 
   function t(key) {
     return (translations[currentLang] && translations[currentLang][key]) || key;
   }
 
   function updateLangButtons() {
-    var buttons = document.querySelectorAll('.lang-btn');
+    const buttons = document.querySelectorAll('.lang-btn');
     buttons.forEach(function (btn) {
       btn.classList.toggle('active', btn.getAttribute('data-lang') === currentLang);
     });
@@ -102,22 +128,22 @@
   function applyTranslations() {
     document.documentElement.lang = currentLang === 'ko' ? 'de' : currentLang;
 
-    var titles = {
+    const titles = {
       de: '2Rad Wächter Köln – Bike- & Scooter-Sharing im Überblick',
       en: '2Wheel Guardian Cologne – Bike & Scooter Sharing at a Glance',
       ko: '2Rad Wächter Kölle – Bike- & Scooter-Sharing op ene Blick'
     };
     document.title = titles[currentLang] || titles.de;
 
-    var nodes = document.querySelectorAll('[data-i18n]');
+    const nodes = document.querySelectorAll('[data-i18n]');
     nodes.forEach(function (node) {
-      var key = node.getAttribute('data-i18n');
+      const key = node.getAttribute('data-i18n');
       node.textContent = t(key);
     });
 
-    var ariaNodes = document.querySelectorAll('[data-i18n-aria]');
+    const ariaNodes = document.querySelectorAll('[data-i18n-aria]');
     ariaNodes.forEach(function (node) {
-      var key = node.getAttribute('data-i18n-aria');
+      const key = node.getAttribute('data-i18n-aria');
       node.setAttribute('aria-label', t(key));
     });
 
@@ -125,8 +151,7 @@
   }
 
   function setLanguage(lang, fromUser) {
-    var normalized = normalizeLang(lang) || 'de';
-    currentLang = normalized;
+    currentLang = normalizeLang(lang) || 'de';
     if (fromUser) {
       userHasChosen = true;
       localStorage.setItem(STORAGE_KEY, currentLang);
@@ -138,23 +163,28 @@
   }
 
   function formatNumber(n) {
-    var locale = currentLang === 'en' ? 'en-US' : 'de-DE';
+    const locale = currentLang === 'en' ? 'en-US' : 'de-DE';
     return new Intl.NumberFormat(locale).format(n);
   }
 
   function typeBadges(types) {
     return types.map(function (type) {
-      var label = type === 'bike' ? t('typeBike') : t('typeEscooter');
+      const label = type === 'bike' ? t('typeBike') : t('typeEscooter');
       return '<span class="provider-type-badge">' + label + '</span>';
     }).join('');
   }
 
+  /**
+   * @param {ProviderResponse} data
+   */
   function renderProviders(data) {
-    var providers = data.providers || [];
+    /** @type {Provider[]} */
+    const providers = data.providers || [];
 
-    var totalBikes = 0;
-    var totalEscooters = 0;
-    providers.forEach(function (p) {
+    let totalBikes = 0;
+    let totalEscooters = 0;
+    providers.forEach(function (/** @type {Provider} */ p) {
+      if (!p.available) { return; }
       totalBikes += p.bikes || 0;
       totalEscooters += p.escooters || 0;
     });
@@ -163,30 +193,40 @@
     document.getElementById('total-escooters').textContent = formatNumber(totalEscooters);
     document.getElementById('total-vehicles').textContent = formatNumber(totalBikes + totalEscooters);
 
-    var updatedEl = document.getElementById('updated-time');
+    const updatedEl = document.getElementById('updated-time');
     if (data.updated) {
-      var d = new Date(data.updated);
-      var locale = currentLang === 'en' ? 'en-US' : 'de-DE';
+      const d = new Date(data.updated);
+      const locale = currentLang === 'en' ? 'en-US' : 'de-DE';
       updatedEl.dateTime = data.updated;
-      updatedEl.textContent = new Intl.DateTimeFormat(locale, {
-        dateStyle: 'medium',
-        timeStyle: 'short'
-      }).format(d);
+      /** @type {Intl.DateTimeFormatOptions} */
+      const dateTimeOptions = { dateStyle: 'medium', timeStyle: 'short' };
+      updatedEl.textContent = new Intl.DateTimeFormat(locale, dateTimeOptions).format(d);
     }
 
-    var grid = document.getElementById('provider-grid');
+    const grid = document.getElementById('provider-grid');
     grid.innerHTML = providers
       .slice()
-      .sort(function (a, b) { return (b.bikes + b.escooters) - (a.bikes + a.escooters); })
-      .map(function (p) {
-        return (
-          '<article class="provider-card" style="--provider-color: ' + (p.color || '#ef0000') + '">' +
-            '<h3>' + p.name + '</h3>' +
-            '<div class="provider-types">' + typeBadges(p.types || []) + '</div>' +
+      .sort(function (/** @type {Provider} */ a, /** @type {Provider} */ b) {
+        if (!a.available && !b.available) { return 0; }
+        if (!a.available) { return 1; }
+        if (!b.available) { return -1; }
+        return (b.bikes + b.escooters) - (a.bikes + a.escooters);
+      })
+      .map(function (/** @type {Provider} */ p) {
+        const counts = p.available
+          ? (
             '<div class="provider-counts">' +
               '<div><strong>' + formatNumber(p.bikes || 0) + '</strong>' + t('bikesLabel') + '</div>' +
               '<div><strong>' + formatNumber(p.escooters || 0) + '</strong>' + t('escootersLabel') + '</div>' +
-            '</div>' +
+            '</div>'
+          )
+          : '<div class="provider-counts provider-counts--unavailable">' + t('noDataLabel') + '</div>';
+
+        return (
+          '<article class="provider-card' + (p.available ? '' : ' provider-card--unavailable') + '" style="--provider-color: ' + (p.color || '#ef0000') + '">' +
+            '<h3>' + p.name + '</h3>' +
+            '<div class="provider-types">' + typeBadges(p.types || []) + '</div>' +
+            counts +
           '</article>'
         );
       })
@@ -194,7 +234,7 @@
   }
 
   function loadData() {
-    var grid = document.getElementById('provider-grid');
+    const grid = document.getElementById('provider-grid');
     grid.innerHTML = '<p>' + t('loading') + '</p>';
 
     fetch(DATA_URL, { cache: 'no-store' })
@@ -234,20 +274,20 @@
 
   // --- Dark mode -------------------------------------------------------
 
-  var THEME_STORAGE_KEY = '2rad-theme';
-  var darkModeQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  const THEME_STORAGE_KEY = '2rad-theme';
+  const darkModeQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
 
   function getSystemTheme() {
     return darkModeQuery && darkModeQuery.matches ? 'dark' : 'light';
   }
 
-  var themeUserHasChosen = !!localStorage.getItem(THEME_STORAGE_KEY);
-  var currentTheme = localStorage.getItem(THEME_STORAGE_KEY) || getSystemTheme();
+  let themeUserHasChosen = !!localStorage.getItem(THEME_STORAGE_KEY);
+  let currentTheme = localStorage.getItem(THEME_STORAGE_KEY) || getSystemTheme();
 
   function applyTheme(theme) {
     currentTheme = theme === 'dark' ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', currentTheme);
-    var toggle = document.getElementById('theme-toggle');
+    const toggle = document.getElementById('theme-toggle');
     if (toggle) {
       toggle.setAttribute('aria-pressed', currentTheme === 'dark' ? 'true' : 'false');
     }
@@ -264,7 +304,7 @@
   function initTheme() {
     applyTheme(currentTheme);
 
-    var toggle = document.getElementById('theme-toggle');
+    const toggle = document.getElementById('theme-toggle');
     if (toggle) {
       toggle.addEventListener('click', function () {
         setTheme(currentTheme === 'dark' ? 'light' : 'dark', true);
@@ -274,15 +314,21 @@
     // Only auto-adopt system changes (e.g. OS switching to night mode on a
     // schedule) as long as the user hasn't chosen a theme manually.
     if (darkModeQuery) {
-      var handleSystemChange = function (e) {
+      const handleSystemChange = function (e) {
         if (!themeUserHasChosen) {
           applyTheme(e.matches ? 'dark' : 'light');
         }
       };
       if (darkModeQuery.addEventListener) {
         darkModeQuery.addEventListener('change', handleSystemChange);
-      } else if (darkModeQuery.addListener) {
-        darkModeQuery.addListener(handleSystemChange);
+      } else {
+        // MediaQueryList.addListener is deprecated (replaced by addEventListener),
+        // kept only as a fallback for Safari < 14 / very old browsers.
+        // noinspection JSDeprecatedSymbols
+        const legacyAddListener = darkModeQuery.addListener;
+        if (legacyAddListener) {
+          legacyAddListener.call(darkModeQuery, handleSystemChange);
+        }
       }
     }
   }
