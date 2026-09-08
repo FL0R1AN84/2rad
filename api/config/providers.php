@@ -41,6 +41,7 @@ function voi_gbfs_source(): array
             'discovery_url' => 'https://api.mobidata-bw.de/sharing/gbfs/v3/voi_de/gbfs',
             'bbox' => COLOGNE_BBOX, // nationwide feed, needs filtering.
             'default_form_factor' => 'scooter',
+            'label' => 'voi-de-nationwide', // MOBIDROM_GBFS_CLIENT_SECRET not set.
         ];
     }
 
@@ -62,6 +63,7 @@ function voi_gbfs_source(): array
         'discovery_url' => $discoveryUrl,
         'bbox' => null, // Cologne-only dataset already.
         'default_form_factor' => 'scooter',
+        'label' => 'mobidrom-cologne', // MOBIDROM_GBFS_CLIENT_SECRET is set.
         'auth' => [
             'type' => 'oauth2-client-credentials',
             'token_url' => $tokenUrl,

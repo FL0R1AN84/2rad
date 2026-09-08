@@ -128,6 +128,10 @@ foreach (get_provider_config() as $config) {
         'escooters' => $counts['escooters'],
         'color' => $config['color'],
         'live' => $isLive,
+        // Which concrete feed backed this reading (e.g. "mobidrom-cologne"
+        // vs. "voi-de-nationwide"); mainly useful for diagnosing config/env
+        // issues per provider. Omitted for providers without a 'label'.
+        'source' => $config['source']['label'] ?? null,
     ];
 }
 

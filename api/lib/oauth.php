@@ -90,6 +90,10 @@ function oauth_get_client_credentials_token(string $cacheKey, string $tokenUrl, 
 
     $token = oauth_request_token($tokenUrl, $clientId, $clientSecret);
     if ($token === null) {
+        // Logged (without the secret) so hosting error logs show *why* a
+        // provider fell back to dummy/cached data, e.g. wrong client
+        // secret or an unreachable token endpoint.
+        error_log("gbfs oauth: token request failed for '$cacheKey' (token_url=$tokenUrl, client_id=$clientId)");
         // Fall back to a still-valid cached token, if any, rather than failing outright.
         return ($cached !== null && time() < (int) ($cached['expires_at'] ?? 0)) ? $cached['access_token'] : null;
     }
