@@ -311,13 +311,15 @@
       });
     }
 
-    // Only auto-adopt system changes (e.g. OS switching to night mode on a
-    // schedule) as long as the user hasn't chosen a theme manually.
+    // A live OS theme change always wins, even after a manual toggle: the
+    // manual choice only holds until the system preference actually changes,
+    // at which point we resync and forget the stored override so future
+    // system changes keep being picked up automatically.
     if (darkModeQuery) {
       const handleSystemChange = function (e) {
-        if (!themeUserHasChosen) {
-          applyTheme(e.matches ? 'dark' : 'light');
-        }
+        themeUserHasChosen = false;
+        localStorage.removeItem(THEME_STORAGE_KEY);
+        applyTheme(e.matches ? 'dark' : 'light');
       };
       if (darkModeQuery.addEventListener) {
         darkModeQuery.addEventListener('change', handleSystemChange);
