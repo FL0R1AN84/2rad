@@ -14,11 +14,20 @@
 /**
  * Fetch and JSON-decode a URL. Returns null on any failure (network error,
  * non-2xx status, invalid JSON) so callers can fall back gracefully.
+ *
+ * $bearerToken, when given, is sent as an `Authorization: Bearer ...`
+ * header (used by feeds that require OAuth2 client-credentials auth,
+ * e.g. MOBIDROM/mobilitaetsdaten.nrw).
  */
-function gbfs_fetch_json(string $url, int $timeoutSeconds = 8): ?array
+function gbfs_fetch_json(string $url, ?string $bearerToken = null, int $timeoutSeconds = 8): ?array
 {
     if (!function_exists('curl_init')) {
         return null;
+    }
+
+    $headers = ['Accept: application/json'];
+    if ($bearerToken !== null) {
+        $headers[] = 'Authorization: Bearer ' . $bearerToken;
     }
 
     $ch = curl_init($url);
@@ -27,7 +36,7 @@ function gbfs_fetch_json(string $url, int $timeoutSeconds = 8): ?array
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_TIMEOUT => $timeoutSeconds,
         CURLOPT_CONNECTTIMEOUT => $timeoutSeconds,
-        CURLOPT_HTTPHEADER => ['Accept: application/json'],
+        CURLOPT_HTTPHEADER => $headers,
         CURLOPT_USERAGENT => '2rad-waechter-koeln/1.0 (+https://2rad.waechter.koeln)',
     ]);
     $body = curl_exec($ch);
@@ -114,9 +123,9 @@ function gbfs_classify_form_factor(?string $formFactor): string
  * Sum available vehicles across a station-based GBFS system.
  * Returns null if the feed could not be read.
  */
-function gbfs_count_stations(string $discoveryUrl, ?array $bbox = null): ?int
+function gbfs_count_stations(string $discoveryUrl, ?array $bbox = null, ?string $bearerToken = null): ?int
 {
-    $discovery = gbfs_fetch_json($discoveryUrl);
+    $discovery = gbfs_fetch_json($discoveryUrl, $bearerToken);
     if ($discovery === null) {
         return null;
     }
@@ -125,7 +134,7 @@ function gbfs_count_stations(string $discoveryUrl, ?array $bbox = null): ?int
     if ($statusUrl === null) {
         return null;
     }
-    $status = gbfs_fetch_json($statusUrl);
+    $status = gbfs_fetch_json($statusUrl, $bearerToken);
     $stations = $status['data']['stations'] ?? null;
     if (!is_array($stations)) {
         return null;
@@ -136,7 +145,7 @@ function gbfs_count_stations(string $discoveryUrl, ?array $bbox = null): ?int
     $positions = [];
     if ($bbox !== null) {
         $infoUrl = gbfs_resolve_feed_url($discovery, 'station_information');
-        $info = $infoUrl !== null ? gbfs_fetch_json($infoUrl) : null;
+        $info = $infoUrl !== null ? gbfs_fetch_json($infoUrl, $bearerToken) : null;
         foreach (($info['data']['stations'] ?? []) as $station) {
             if (isset($station['station_id'])) {
                 $positions[$station['station_id']] = [$station['lat'] ?? null, $station['lon'] ?? null];
@@ -169,9 +178,9 @@ function gbfs_count_stations(string $discoveryUrl, ?array $bbox = null): ?int
  *
  * Returns ['bikes' => int, 'escooters' => int] or null on failure.
  */
-function gbfs_count_free_floating(string $discoveryUrl, ?array $bbox, string $defaultFormFactor): ?array
+function gbfs_count_free_floating(string $discoveryUrl, ?array $bbox, string $defaultFormFactor, ?string $bearerToken = null): ?array
 {
-    $discovery = gbfs_fetch_json($discoveryUrl);
+    $discovery = gbfs_fetch_json($discoveryUrl, $bearerToken);
     if ($discovery === null) {
         return null;
     }
@@ -182,7 +191,7 @@ function gbfs_count_free_floating(string $discoveryUrl, ?array $bbox, string $de
     if ($vehiclesUrl === null) {
         return null;
     }
-    $vehicleData = gbfs_fetch_json($vehiclesUrl);
+    $vehicleData = gbfs_fetch_json($vehiclesUrl, $bearerToken);
     // GBFS 1.x/2.x: data.bikes, GBFS 3.x: data.vehicles.
     $vehicles = $vehicleData['data']['vehicles'] ?? $vehicleData['data']['bikes'] ?? null;
     if (!is_array($vehicles)) {
@@ -193,7 +202,7 @@ function gbfs_count_free_floating(string $discoveryUrl, ?array $bbox, string $de
     $formFactorByTypeId = [];
     $typesUrl = gbfs_resolve_feed_url($discovery, 'vehicle_types');
     if ($typesUrl !== null) {
-        $types = gbfs_fetch_json($typesUrl);
+        $types = gbfs_fetch_json($typesUrl, $bearerToken);
         foreach (($types['data']['vehicle_types'] ?? []) as $type) {
             if (isset($type['vehicle_type_id'])) {
                 $formFactorByTypeId[$type['vehicle_type_id']] = $type['form_factor'] ?? null;

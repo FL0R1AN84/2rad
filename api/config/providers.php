@@ -23,19 +23,52 @@ const COLOGNE_BBOX = [
 ];
 
 /**
- * Voi has started publishing open GBFS data for Cologne via the NRW
- * mobility-data agency MOBIDROM (mobidrom.nrw), in addition to its
- * nationwide feed. Since the exact public MOBIDROM endpoint isn't
- * documented yet, it can be configured via environment variable once
- * available (e.g. through registration as a data consumer); otherwise the
- * code falls back to Voi's nationwide feed filtered down to Cologne.
+ * Voi publishes open GBFS data for Cologne via the NRW mobility-data
+ * agency MOBIDROM (mobilitaetsdaten.nrw), authenticated via OAuth2
+ * client-credentials (Keycloak). Only the client *secret* is sensitive,
+ * so it's the only required environment variable; token URL, client id
+ * and resource URL have working defaults but can be overridden too.
+ *
+ * Falls back to Voi's nationwide feed (filtered to Cologne, no auth
+ * required) when MOBIDROM_GBFS_CLIENT_SECRET isn't configured.
  */
-function voi_gbfs_discovery_url(): string
+function voi_gbfs_source(): array
 {
-    $mobidromUrl = getenv('MOBIDROM_VOI_GBFS_URL');
-    return $mobidromUrl !== false && $mobidromUrl !== ''
-        ? $mobidromUrl
-        : 'https://api.mobidata-bw.de/sharing/gbfs/v3/voi_de/gbfs';
+    $clientSecret = getenv('MOBIDROM_GBFS_CLIENT_SECRET');
+    if ($clientSecret === false || $clientSecret === '') {
+        return [
+            'type' => 'gbfs-free-floating',
+            'discovery_url' => 'https://api.mobidata-bw.de/sharing/gbfs/v3/voi_de/gbfs',
+            'bbox' => COLOGNE_BBOX, // nationwide feed, needs filtering.
+            'default_form_factor' => 'scooter',
+        ];
+    }
+
+    $discoveryUrl = getenv('MOBIDROM_VOI_GBFS_URL');
+    if ($discoveryUrl === false || $discoveryUrl === '') {
+        $discoveryUrl = 'https://www.mobilitaetsdaten.nrw/api/systemadapter-gbfs-provider/feed/v3.0/voi-koeln/source-voi-koeln/gbfs.json';
+    }
+    $tokenUrl = getenv('MOBIDROM_GBFS_TOKEN_URL');
+    if ($tokenUrl === false || $tokenUrl === '') {
+        $tokenUrl = 'https://www.mobilitaetsdaten.nrw/keycloak/realms/mobidrom/protocol/openid-connect/token';
+    }
+    $clientId = getenv('MOBIDROM_GBFS_CLIENT_ID');
+    if ($clientId === false || $clientId === '') {
+        $clientId = 'gbfs-api';
+    }
+
+    return [
+        'type' => 'gbfs-free-floating',
+        'discovery_url' => $discoveryUrl,
+        'bbox' => null, // Cologne-only dataset already.
+        'default_form_factor' => 'scooter',
+        'auth' => [
+            'type' => 'oauth2-client-credentials',
+            'token_url' => $tokenUrl,
+            'client_id' => $clientId,
+            'client_secret' => $clientSecret,
+        ],
+    ];
 }
 
 function get_provider_config(): array
@@ -103,14 +136,7 @@ function get_provider_config(): array
             'name' => 'Voi',
             'types' => ['escooter'],
             'color' => '#ff2d55',
-            'source' => [
-                'type' => 'gbfs-free-floating',
-                'discovery_url' => voi_gbfs_discovery_url(),
-                // Kept even when using a MOBIDROM Cologne-only endpoint:
-                // harmless there, required for the nationwide fallback feed.
-                'bbox' => COLOGNE_BBOX,
-                'default_form_factor' => 'scooter',
-            ],
+            'source' => voi_gbfs_source(),
             'fallback' => ['bikes' => 0, 'escooters' => 275],
         ],
         [

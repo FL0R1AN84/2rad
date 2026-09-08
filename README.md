@@ -93,7 +93,7 @@ Vehicle counts are fetched from each provider's public
 | --- | --- | --- |
 | KVB Rad | `nextbike_kg` (nextbike) | Cologne-only, station-based |
 | Call a Bike | `callabike` (mobidata-bw) | Nationwide feed, filtered to a Cologne bounding box |
-| Voi | `voi_de` (mobidata-bw), or MOBIDROM if configured | Nationwide feed, filtered to Cologne; see below |
+| Voi | MOBIDROM Voi Köln (preferred, needs auth), or `voi_de` (mobidata-bw) fallback | Cologne-only via MOBIDROM; nationwide+bbox-filtered otherwise; see below |
 | Dott | `cologne` (ridedott.com) | Cologne-only, free-floating |
 | Donkey Republic, Lime, TIER, Bolt | – | No known public feed for Cologne yet; dummy numbers |
 
@@ -104,15 +104,49 @@ temporarily unreachable, so the site keeps showing real (if slightly
 stale) numbers instead of falling back to dummy data.
 
 **MOBIDROM (NRW mobility-data agency) for Voi:** since September 2025, Voi
-publishes open GBFS data specifically for NRW cities (incl. Cologne) via
-[mobidrom.nrw](https://www.mobidrom.nrw). Once a public MOBIDROM GBFS
-endpoint is available/registered, point the `MOBIDROM_VOI_GBFS_URL`
-environment variable to its auto-discovery URL to use it instead of Voi's
-nationwide feed:
+publishes open, Cologne-only GBFS data via the NRW mobility-data platform
+[mobilitaetsdaten.nrw](https://www.mobilitaetsdaten.nrw) (register as a
+data consumer via "Registrieren", then find the "Voi Köln" dataset under
+Sharing Mobility for the access details). Access requires OAuth2
+client-credentials auth. Set the following environment variables to use
+it (falls back to Voi's nationwide feed, filtered to Cologne, no auth
+required, when `MOBIDROM_GBFS_CLIENT_SECRET` isn't set):
 
 ```bash
-export MOBIDROM_VOI_GBFS_URL="https://.../gbfs.json"
+# Required — the client secret from your MOBIDROM dataset access page.
+# Never commit this value; keep it only in the server's environment
+# (e.g. Plesk's "Environment variables" panel), not in source control.
+export MOBIDROM_GBFS_CLIENT_SECRET="..."
+
+# Optional — defaults shown below match the current Voi Köln dataset.
+export MOBIDROM_GBFS_TOKEN_URL="https://www.mobilitaetsdaten.nrw/keycloak/realms/mobidrom/protocol/openid-connect/token"
+export MOBIDROM_GBFS_CLIENT_ID="gbfs-api"
+export MOBIDROM_VOI_GBFS_URL="https://www.mobilitaetsdaten.nrw/api/systemadapter-gbfs-provider/feed/v3.0/voi-koeln/source-voi-koeln/gbfs.json"
 ```
+
+Access tokens are cached in `api/cache/oauth_tokens.json` (file permissions
+locked to `0600`) and reused until shortly before they expire, so the
+Keycloak token endpoint isn't hit on every request.
+
+**Setting `MOBIDROM_GBFS_CLIENT_SECRET` on Plesk:**
+
+1. **Preferred (real PHP-FPM env variable):** *Websites & Domains* → your
+   domain → **PHP Settings** → make sure "PHP support" is set to a
+   "FPM application" handler → in the **"Additional configuration
+   directives"** box (applies to the php-fpm pool), add:
+   ```
+   env[MOBIDROM_GBFS_CLIENT_SECRET] = OhQP9ryrXU7lnjQ9qteZib3rnys2wkTB
+   ```
+   Not every Plesk plan/subscription exposes this field to the domain
+   owner (it may require reseller/admin access) — if it's missing, use
+   the fallback below instead.
+2. **Fallback (works on any plan, no server config access needed):** copy
+   `api/config/secrets.local.php.example` to
+   `api/config/secrets.local.php` (git-ignored, so it's never committed)
+   and fill in the real secret there via `putenv(...)`. `providers.php`
+   automatically loads it if present.
+
+Either way, never commit the actual secret value to this repository.
 
 ### `GET /api/geo.php`
 

@@ -2,3 +2,4 @@
 .idea/
 /api/cache/*
 !/api/cache/.gitkeep
+/api/config/secrets.local.php
