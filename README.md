@@ -7,9 +7,10 @@ for deployment on a Plesk server.
 
 🔗 Live: [2rad.waechter.koeln](https://2rad.waechter.koeln)
 
-> **Status:** the provider data is currently **dummy data** for demonstration
-> purposes. It is meant to be replaced with real feeds (e.g. GBFS) per
-> provider later on.
+> **Status:** provider data is now backed by real **GBFS** (General Bikeshare
+> Feed Specification) feeds where a public one exists (KVB Rad, Call a Bike,
+> Voi, Dott). Providers without a known public feed (Donkey Republic, Lime,
+> TIER, Bolt) still use dummy numbers until a feed is found or provided.
 
 ## Features
 
@@ -44,8 +45,12 @@ for deployment on a Plesk server.
 ├── css/style.css         Styles (custom properties, dark mode, layout)
 ├── js/app.js             Frontend logic: i18n, theming, data rendering
 ├── api/
-│   ├── providers.php     Dummy JSON endpoint with provider/vehicle data
-│   └── geo.php           IP-based geolocation (Cologne detection)
+│   ├── providers.php     Provider/vehicle-count endpoint (live GBFS + dummy fallback)
+│   ├── geo.php           IP-based geolocation (Cologne detection)
+│   ├── config/providers.php  Per-provider GBFS feed config & dummy fallback numbers
+│   ├── lib/gbfs.php      Minimal GBFS client (discovery, station & free-floating counts)
+│   ├── lib/cache.php     File-based cache so feeds aren't refetched on every request
+│   └── cache/            Generated cache file (git-ignored)
 ├── icon.svg / icon.png / favicon.ico / apple-touch-icon.png
 ├── img/logo-512.png      Logo used for Open Graph / PWA icon
 ├── site.webmanifest      Web app manifest
@@ -56,7 +61,10 @@ for deployment on a Plesk server.
 
 ### `GET /api/providers.php`
 
-Returns the list of sharing providers with their vehicle counts.
+Returns the list of sharing providers with their vehicle counts. Each
+provider also reports `live`: `true` if the numbers come from a real GBFS
+feed (fresh or last known-good cached reading), `false` if they're the
+static dummy fallback.
 
 ```json
 {
@@ -68,10 +76,42 @@ Returns the list of sharing providers with their vehicle counts.
       "types": ["bike"],
       "bikes": 1250,
       "escooters": 0,
-      "color": "#004b93"
+      "color": "#004b93",
+      "live": true
     }
   ]
 }
+```
+
+#### Live data sources (GBFS)
+
+Vehicle counts are fetched from each provider's public
+[GBFS](https://github.com/MobilityData/gbfs) feed, configured in
+`api/config/providers.php`:
+
+| Provider | Feed | Notes |
+| --- | --- | --- |
+| KVB Rad | `nextbike_kg` (nextbike) | Cologne-only, station-based |
+| Call a Bike | `callabike` (mobidata-bw) | Nationwide feed, filtered to a Cologne bounding box |
+| Voi | `voi_de` (mobidata-bw), or MOBIDROM if configured | Nationwide feed, filtered to Cologne; see below |
+| Dott | `cologne` (ridedott.com) | Cologne-only, free-floating |
+| Donkey Republic, Lime, TIER, Bolt | – | No known public feed for Cologne yet; dummy numbers |
+
+Results are cached in `api/cache/gbfs_cache.json` for two minutes
+(`CACHE_TTL_SECONDS` in `api/lib/cache.php`) to avoid hammering upstream
+feeds, and the last known-good reading is kept and reused if a feed is
+temporarily unreachable, so the site keeps showing real (if slightly
+stale) numbers instead of falling back to dummy data.
+
+**MOBIDROM (NRW mobility-data agency) for Voi:** since September 2025, Voi
+publishes open GBFS data specifically for NRW cities (incl. Cologne) via
+[mobidrom.nrw](https://www.mobidrom.nrw). Once a public MOBIDROM GBFS
+endpoint is available/registered, point the `MOBIDROM_VOI_GBFS_URL`
+environment variable to its auto-discovery URL to use it instead of Voi's
+nationwide feed:
+
+```bash
+export MOBIDROM_VOI_GBFS_URL="https://.../gbfs.json"
 ```
 
 ### `GET /api/geo.php`
@@ -99,6 +139,8 @@ Then open <http://localhost:8000>.
 ## Deployment
 
 Upload the project files as-is to any PHP-capable webspace (e.g. Plesk).
-No build step, no dependencies to install. Make sure outbound HTTP requests
-to `ip-api.com` are allowed from the server for the geolocation feature to
-work.
+No build step, no dependencies to install (cURL and JSON PHP extensions are
+required and enabled by default in most PHP setups). Make sure outbound
+HTTP requests are allowed from the server to `ip-api.com` (geolocation) and
+to the GBFS feed hosts listed above (live provider data); `api/cache/` must
+be writable by the webserver so readings can be cached.
