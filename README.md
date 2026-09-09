@@ -10,7 +10,7 @@ for deployment on a Plesk server.
 > **Status:** provider data is backed entirely by real **GBFS** (General
 > Bikeshare Feed Specification) feeds — this app never shows made-up
 > numbers. KVB Rad, Call a Bike, Dott, Voi and Bolt currently have live
-> feeds for Cologne; Donkey Republic, Lime and TIER don't have a known
+> feeds for Cologne; Ryde, Lime and TIER don't have a known
 > public feed for Cologne yet and are shown as **"no live data available"**
 > instead of a fabricated figure until one is found or provided.
 
@@ -79,7 +79,9 @@ differently).
     {
       "id": "kvb-rad",
       "name": "KVB Rad",
-      "types": ["bike"],
+      "types": [
+        "bike"
+      ],
       "bikes": 1250,
       "escooters": 0,
       "color": "#004b93",
@@ -89,7 +91,9 @@ differently).
     {
       "id": "tier",
       "name": "TIER",
-      "types": ["escooter"],
+      "types": [
+        "escooter"
+      ],
       "bikes": null,
       "escooters": null,
       "color": "#1b1b1b",
@@ -106,18 +110,18 @@ Vehicle counts are fetched from each provider's public
 [GBFS](https://github.com/MobilityData/gbfs) feed, configured in
 `api/config/providers.php`:
 
-| Provider | Feed | Notes |
-| --- | --- | --- |
-| KVB Rad | `nextbike_kg` (nextbike) | Cologne-only, station-based |
-| Call a Bike | `callabike` (mobidata-bw) | Nationwide feed, filtered to a Cologne bounding box |
-| Voi | MOBIDROM Voi Köln (preferred, needs auth), or `voi_de` (mobidata-bw) fallback | Cologne-only via MOBIDROM; nationwide+bbox-filtered otherwise; see below |
-| Bolt | MOBIDROM Bolt Köln-Bonn (needs auth) | Combined Köln+Bonn dataset, filtered to a Cologne bounding box |
-| Dott | `cologne` (ridedott.com) | Cologne-only, free-floating |
-| Donkey Republic, TIER | – | No known public feed for Cologne yet; reported as unavailable |
-| Lime | – | MOBIDROM's `lime-nrw` dataset exists but only covers Dortmund/Essen, not Cologne; reported as unavailable |
+| Provider    | Feed                                                                          | Notes                                                                                                     |
+|-------------|-------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| KVB Rad     | `nextbike_kg` (nextbike)                                                      | Cologne-only, station-based                                                                               |
+| Call a Bike | `callabike` (mobidata-bw)                                                     | Nationwide feed, filtered to a Cologne bounding box                                                       |
+| Voi         | MOBIDROM Voi Köln (preferred, needs auth), or `voi_de` (mobidata-bw) fallback | Cologne-only via MOBIDROM; nationwide+bbox-filtered otherwise; see below                                  |
+| Bolt        | MOBIDROM Bolt Köln-Bonn (needs auth)                                          | Combined Köln+Bonn dataset, filtered to a Cologne bounding box                                            |
+| Dott        | `cologne` (ridedott.com)                                                      | Cologne-only, free-floating                                                                               |
+| Ryde, TIER  | –                                                                             | No known public feed for Cologne yet; reported as unavailable                                             |
+| Lime        | –                                                                             | MOBIDROM's `lime-nrw` dataset exists but only covers Dortmund/Essen, not Cologne; reported as unavailable |
 
-Results are cached in `api/cache/gbfs_cache.json` for two minutes
-(`CACHE_TTL_SECONDS` in `api/lib/cache.php`) to avoid hammering upstream
+Results are cached in `api/cache/gbfs_cache.json` for two minutes (`CACHE_TTL_SECONDS` in `api/lib/cache.php`) to avoid
+hammering upstream
 feeds, and the last known-good reading is kept and reused if a feed is
 temporarily unreachable, so the site keeps showing real (if slightly
 stale) numbers instead of showing "unavailable" during a brief outage.
@@ -177,7 +181,11 @@ the free [ip-api.com](https://ip-api.com) service. Falls back to
 `isCologne: false` for local/private IPs (e.g. during local development).
 
 ```json
-{ "city": "Cologne", "countryCode": "DE", "isCologne": true }
+{
+  "city": "Cologne",
+  "countryCode": "DE",
+  "isCologne": true
+}
 ```
 
 ## Local development

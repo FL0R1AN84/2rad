@@ -123,7 +123,7 @@ function get_provider_config(): array
             'id' => 'kvb-rad',
             'name' => 'KVB Rad',
             'types' => ['bike'],
-            'color' => '#004b93',
+            'color' => '#e30613',
             'source' => [
                 'type' => 'gbfs-stations',
                 'discovery_url' => 'https://gbfs.nextbike.net/maps/gbfs/v2/nextbike_kg/gbfs.json',
@@ -134,7 +134,7 @@ function get_provider_config(): array
             'id' => 'call-a-bike',
             'name' => 'Call a Bike',
             'types' => ['bike'],
-            'color' => '#ec0016',
+            'color' => '#bd0012',
             'source' => [
                 'type' => 'gbfs-free-floating',
                 'discovery_url' => 'https://api.mobidata-bw.de/sharing/gbfs/v3/callabike/gbfs',
@@ -143,17 +143,17 @@ function get_provider_config(): array
             ],
         ],
         [
-            'id' => 'donkey-republic',
-            'name' => 'Donkey Republic',
-            'types' => ['bike'],
-            'color' => '#f2b01e',
+            'id' => 'ryde',
+            'name' => 'Ryde',
+            'types' => ['escooter'],
+            'color' => '#3ea219',
             'source' => ['type' => 'static'], // no public feed for Cologne yet.
         ],
         [
             'id' => 'lime',
             'name' => 'Lime',
             'types' => ['escooter', 'bike'],
-            'color' => '#00e676',
+            'color' => '#00b100',
             // MOBIDROM's "lime-nrw" dataset exists but only covers Dortmund
             // and Essen (no Cologne system as of Sept. 2026) — not usable here.
             'source' => ['type' => 'static'],
@@ -169,21 +169,21 @@ function get_provider_config(): array
             'id' => 'bolt',
             'name' => 'Bolt',
             'types' => ['escooter'],
-            'color' => '#34d186',
+            'color' => '#18784c',
             'source' => bolt_gbfs_source(),
         ],
         [
             'id' => 'voi',
             'name' => 'Voi',
             'types' => ['escooter'],
-            'color' => '#ff2d55',
+            'color' => '#d04740',
             'source' => voi_gbfs_source(),
         ],
         [
             'id' => 'dott',
             'name' => 'Dott',
             'types' => ['escooter'],
-            'color' => '#ffe000',
+            'color' => '#009ddb',
             'source' => [
                 'type' => 'gbfs-free-floating',
                 'discovery_url' => 'https://gbfs.api.ridedott.com/public/v2/cologne/gbfs.json',
