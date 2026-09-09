@@ -147,15 +147,8 @@ function get_provider_config(): array
             'name' => 'Ryde',
             'types' => ['escooter'],
             'color' => '#3ea219',
-            'source' => [
-                'type' => 'gbfs-free-floating',
-                'discovery_url' => 'https://www.mobilitaetsdaten.nrw/api/systemadapter-gbfs-provider/feed/v3.0/ryde-koeln/source-ryde-koeln/gbfs.json',
-                'bbox' => null, // Cologne-only dataset
-                'default_form_factor' => 'scooter',
-                'label' => 'mobidrom-cologne',
-                'auth' => mobidrom_auth(), // Braucht OAuth2-Authentifizierung
-    ],
-],
+            'source' => ['type' => 'static'], // no public feed for Cologne yet.
+        ],
         [
             'id' => 'lime',
             'name' => 'Lime',
