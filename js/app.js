@@ -89,7 +89,7 @@
       noDataLabel: 'Keine Live-Date do',
       typeBike: 'Rääder',
       typeEscooter: 'eScooter',
-      bikesLabel: 'Rääder',
+      bikesLabel: 'Drohtesel',
       escootersLabel: 'Scooter',
       loading: 'Date wääde jelade …',
       loadError: 'Date konnte nit jelade wääde.',
