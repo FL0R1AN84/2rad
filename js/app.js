@@ -77,23 +77,23 @@
       themeToggleLabel: 'Toggle color scheme'
     },
     ko: {
-      siteTitle: '2Rad Wächter Kölle',
-      heroTitle: 'All die Sharing-Anbieter för Fahrrad un eScooter en Kölle',
-      heroSubtitle: 'Jeck op Räder? Hä kriss du op ene Blick, wie vill Fahrrööder un eScooter jrad en Kölle ze han sin.',
+      siteTitle: '2Rääder Wächter Kölle',
+      heroTitle: 'All die Sharing-Anbieter för Rääder un eScooter en Kölle',
+      heroSubtitle: 'Jeck op Rääder? Hä kriss de op ene Blick, wie vill Rääder un eScooter jrad en Kölle ze han sin.',
       lastUpdated: 'Stand:',
       totalVehicles: 'Fahrzeuge insgesamt',
-      totalBikes: 'Fahrrööder',
+      totalBikes: 'Rääder',
       totalEscooters: 'eScooter',
       providersHeading: 'Anbieter en Kölle',
-      footerNote: 'Live-Date us de öffentliche GBFS-Feeds vun de Anbieter. Wo (noch) kein Live-Date do sin, steiht dat bei däm Anbieter drusse.',
-      noDataLabel: 'Kein Live-Date do',
-      typeBike: 'Fahrrad',
+      footerNote: 'Live-Date us de öffentliche GBFS-Feeds vun de Anbieter. Wo (noch) keine Live-Date do sin, steiht dat bei däm Anbieter drusse.',
+      noDataLabel: 'Keine Live-Date do',
+      typeBike: 'Rääder',
       typeEscooter: 'eScooter',
       bikesLabel: 'Rääder',
       escootersLabel: 'Scooter',
       loading: 'Date wääde jelade …',
       loadError: 'Date konnte nit jelade wääde.',
-      themeToggleLabel: 'Farrschema wähle'
+      themeToggleLabel: 'Modus wähle'
     }
   };
 
@@ -107,7 +107,9 @@
     // noinspection JSDeprecatedSymbols
     const navLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
     const navLangs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navLang];
-    const isGerman = navLangs.some(function (l) { return (l || '').toLowerCase().indexOf('de') === 0; });
+    const isGerman = navLangs.some(function (l) {
+      return (l || '').toLowerCase().indexOf('de') === 0;
+    });
     return isGerman ? 'de' : 'en';
   }
 
@@ -184,7 +186,9 @@
     let totalBikes = 0;
     let totalEscooters = 0;
     providers.forEach(function (/** @type {Provider} */ p) {
-      if (!p.available) { return; }
+      if (!p.available) {
+        return;
+      }
       totalBikes += p.bikes || 0;
       totalEscooters += p.escooters || 0;
     });
@@ -199,7 +203,7 @@
       const locale = currentLang === 'en' ? 'en-US' : 'de-DE';
       updatedEl.dateTime = data.updated;
       /** @type {Intl.DateTimeFormatOptions} */
-      const dateTimeOptions = { dateStyle: 'medium', timeStyle: 'short' };
+      const dateTimeOptions = {dateStyle: 'medium', timeStyle: 'short'};
       updatedEl.textContent = new Intl.DateTimeFormat(locale, dateTimeOptions).format(d);
     }
 
@@ -207,26 +211,32 @@
     grid.innerHTML = providers
       .slice()
       .sort(function (/** @type {Provider} */ a, /** @type {Provider} */ b) {
-        if (!a.available && !b.available) { return 0; }
-        if (!a.available) { return 1; }
-        if (!b.available) { return -1; }
+        if (!a.available && !b.available) {
+          return 0;
+        }
+        if (!a.available) {
+          return 1;
+        }
+        if (!b.available) {
+          return -1;
+        }
         return (b.bikes + b.escooters) - (a.bikes + a.escooters);
       })
       .map(function (/** @type {Provider} */ p) {
         const counts = p.available
           ? (
             '<div class="provider-counts">' +
-              '<div><strong>' + formatNumber(p.bikes || 0) + '</strong>' + t('bikesLabel') + '</div>' +
-              '<div><strong>' + formatNumber(p.escooters || 0) + '</strong>' + t('escootersLabel') + '</div>' +
+            '<div><strong>' + formatNumber(p.bikes || 0) + '</strong>' + t('bikesLabel') + '</div>' +
+            '<div><strong>' + formatNumber(p.escooters || 0) + '</strong>' + t('escootersLabel') + '</div>' +
             '</div>'
           )
           : '<div class="provider-counts provider-counts--unavailable">' + t('noDataLabel') + '</div>';
 
         return (
           '<article class="provider-card' + (p.available ? '' : ' provider-card--unavailable') + '" style="--provider-color: ' + (p.color || '#ef0000') + '">' +
-            '<h3>' + p.name + '</h3>' +
-            '<div class="provider-types">' + typeBadges(p.types || []) + '</div>' +
-            counts +
+          '<h3>' + p.name + '</h3>' +
+          '<div class="provider-types">' + typeBadges(p.types || []) + '</div>' +
+          counts +
           '</article>'
         );
       })
@@ -237,9 +247,11 @@
     const grid = document.getElementById('provider-grid');
     grid.innerHTML = '<p>' + t('loading') + '</p>';
 
-    fetch(DATA_URL, { cache: 'no-store' })
+    fetch(DATA_URL, {cache: 'no-store'})
       .then(function (res) {
-        if (!res.ok) { throw new Error('HTTP ' + res.status); }
+        if (!res.ok) {
+          throw new Error('HTTP ' + res.status);
+        }
         return res.json();
       })
       .then(function (data) {
@@ -257,9 +269,11 @@
     if (userHasChosen) {
       return;
     }
-    fetch(GEO_URL, { cache: 'no-store' })
+    fetch(GEO_URL, {cache: 'no-store'})
       .then(function (res) {
-        if (!res.ok) { throw new Error('HTTP ' + res.status); }
+        if (!res.ok) {
+          throw new Error('HTTP ' + res.status);
+        }
         return res.json();
       })
       .then(function (geo) {
