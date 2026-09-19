@@ -1,110 +1,152 @@
 <!doctype html>
 <html class="no-js" lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta content="light dark" name="color-scheme" />
+    <title>2Rad Wächter Köln – Bike- & Scooter-Sharing im Überblick</title>
+    <script>
+      (function () {
+        try {
+          const stored = localStorage.getItem("2rad-theme");
+          const theme =
+            stored ||
+            (window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light");
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (e) {}
+      })();
+    </script>
+    <link href="css/style.css" rel="stylesheet" />
+    <link href="https://2rad.waechter.koeln/" rel="canonical" />
+    <meta
+      content="Alle Bike- und eScooter-Sharing-Anbieter in Köln auf einen Blick – mit aktueller Anzahl verfügbarer Fahrzeuge."
+      id="meta-description"
+      name="description"
+    />
 
-<head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1" name="viewport">
-  <meta content="light dark" name="color-scheme">
-  <title>2Rad Wächter Köln – Bike- & Scooter-Sharing im Überblick</title>
-  <script>
-    (function () {
-      try {
-        const stored = localStorage.getItem('2rad-theme');
-        const theme = stored || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        document.documentElement.setAttribute('data-theme', theme);
-      } catch (e) {
-      }
-    })();
-  </script>
-  <link href="css/style.css" rel="stylesheet">
-  <meta
-    content="Alle Bike- und eScooter-Sharing-Anbieter in Köln auf einen Blick – mit aktueller Anzahl verfügbarer Fahrzeuge."
-    name="description">
+    <meta content="2Rad Wächter Köln" id="meta-og-title" property="og:title" />
+    <meta
+      content="Alle Bike- und eScooter-Sharing-Anbieter in Köln auf einen Blick – mit aktueller Anzahl verfügbarer Fahrzeuge."
+      id="meta-og-description"
+      property="og:description"
+    />
+    <meta content="website" property="og:type" />
+    <meta content="https://2rad.waechter.koeln" property="og:url" />
+    <meta content="/img/logo-512.png" property="og:image" />
+    <meta content="2Rad Wächter Köln Logo" property="og:image:alt" />
+    <meta content="de_DE" id="meta-og-locale" property="og:locale" />
+    <meta content="en_US" property="og:locale:alternate" />
+    <meta content="summary" name="twitter:card" />
+    <meta
+      content="2Rad Wächter Köln"
+      id="meta-twitter-title"
+      name="twitter:title"
+    />
+    <meta
+      content="Alle Bike- und eScooter-Sharing-Anbieter in Köln auf einen Blick – mit aktueller Anzahl verfügbarer Fahrzeuge."
+      id="meta-twitter-description"
+      name="twitter:description"
+    />
 
-  <meta content="2Rad Wächter Köln" property="og:title">
-  <meta content="website" property="og:type">
-  <meta content="https://2rad.waechter.koeln" property="og:url">
-  <meta content="/img/logo-512.png" property="og:image">
-  <meta content="2Rad Wächter Köln Logo" property="og:image:alt">
+    <link href="/favicon.ico" rel="icon" sizes="any" />
+    <link href="/icon.svg" rel="icon" type="image/svg+xml" />
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" />
 
-  <link href="/favicon.ico" rel="icon" sizes="any">
-  <link href="/icon.svg" rel="icon" type="image/svg+xml">
-  <link href="/apple-touch-icon.png" rel="apple-touch-icon">
+    <link href="site.webmanifest" rel="manifest" />
+    <meta
+      content="#ef0000"
+      media="(prefers-color-scheme: light)"
+      name="theme-color"
+    />
+    <meta
+      content="#14171c"
+      media="(prefers-color-scheme: dark)"
+      name="theme-color"
+    />
+  </head>
 
-  <link href="site.webmanifest" rel="manifest">
-  <meta content="#ef0000" media="(prefers-color-scheme: light)" name="theme-color">
-  <meta content="#14171c" media="(prefers-color-scheme: dark)" name="theme-color">
-</head>
-
-<body>
-
-<header class="site-header">
-  <div class="container header-inner">
-    <a class="logo" href="/">
-      <img alt="" height="36" src="icon.svg" width="36">
-      <span data-i18n="siteTitle">2Rad Wächter Köln</span>
-    </a>
-    <div class="header-controls">
-      <div aria-label="Sprache wechseln" class="lang-switch" role="group">
-        <button class="lang-btn" data-lang="de" type="button">DE</button>
-        <button class="lang-btn" data-lang="ko" type="button">Kölsch</button>
-        <button class="lang-btn" data-lang="en" type="button">EN</button>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="logo" href="/">
+          <img alt="" height="36" src="icon.svg" width="36" />
+          <span data-i18n="siteTitle">2Rad Wächter Köln</span>
+        </a>
+        <div class="header-controls">
+          <div aria-label="Sprache wechseln" class="lang-switch" role="group">
+            <button class="lang-btn" data-lang="de" type="button">DE</button>
+            <button class="lang-btn" data-lang="ko" type="button">
+              Kölsch
+            </button>
+            <button class="lang-btn" data-lang="en" type="button">EN</button>
+          </div>
+          <button
+            aria-label="Farbschema wechseln"
+            class="theme-toggle"
+            data-i18n-aria="themeToggleLabel"
+            id="theme-toggle"
+            type="button"
+          >
+            <span aria-hidden="true" class="icon-moon">🌙</span>
+            <span aria-hidden="true" class="icon-sun">☀️</span>
+          </button>
+        </div>
       </div>
-      <button aria-label="Farbschema wechseln" class="theme-toggle" data-i18n-aria="themeToggleLabel" id="theme-toggle"
-              type="button">
-        <span aria-hidden="true" class="icon-moon">🌙</span>
-        <span aria-hidden="true" class="icon-sun">☀️</span>
-      </button>
-    </div>
-  </div>
-</header>
+    </header>
 
-<main>
-  <section class="hero container">
-    <h1 data-i18n="heroTitle">Alle Bike- & eScooter-Sharing-Anbieter in Köln</h1>
-    <p class="subtitle" data-i18n="heroSubtitle">
-      Auf einen Blick: wie viele Fahrräder und eScooter aktuell in Köln zum Ausleihen verfügbar sind.
-    </p>
-    <p class="updated-at">
-      <span data-i18n="lastUpdated">Stand:</span>
-      <time id="updated-time">–</time>
-    </p>
-  </section>
+    <main>
+      <section class="hero container">
+        <h1 data-i18n="heroTitle">
+          Alle Bike- & eScooter-Sharing-Anbieter in Köln
+        </h1>
+        <p class="subtitle" data-i18n="heroSubtitle">
+          Auf einen Blick: wie viele Fahrräder und eScooter aktuell in Köln zum
+          Ausleihen verfügbar sind.
+        </p>
+        <p class="updated-at">
+          <span data-i18n="lastUpdated">Stand:</span>
+          <time id="updated-time">–</time>
+        </p>
+      </section>
 
-  <section aria-label="Gesamtübersicht" class="totals container">
-    <div class="stat-card">
-      <div class="stat-value" id="total-vehicles">–</div>
-      <div class="stat-label" data-i18n="totalVehicles">Fahrzeuge insgesamt</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="total-bikes">–</div>
-      <div class="stat-label" data-i18n="totalBikes">Fahrräder</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="total-escooters">–</div>
-      <div class="stat-label" data-i18n="totalEscooters">eScooter</div>
-    </div>
-  </section>
+      <section aria-label="Gesamtübersicht" class="totals container">
+        <div class="stat-card">
+          <div class="stat-value" id="total-vehicles">–</div>
+          <div class="stat-label" data-i18n="totalVehicles">
+            Fahrzeuge insgesamt
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="total-bikes">–</div>
+          <div class="stat-label" data-i18n="totalBikes">Fahrräder</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="total-escooters">–</div>
+          <div class="stat-label" data-i18n="totalEscooters">eScooter</div>
+        </div>
+      </section>
 
-  <section class="providers container">
-    <h2 data-i18n="providersHeading">Anbieter in Köln</h2>
-    <div aria-live="polite" class="provider-grid" id="provider-grid">
-      <!-- Provider cards are inserted via JavaScript -->
-    </div>
-  </section>
-</main>
+      <section class="providers container">
+        <h2 data-i18n="providersHeading">Anbieter in Köln</h2>
+        <div aria-live="polite" class="provider-grid" id="provider-grid">
+          <!-- Provider cards are inserted via JavaScript -->
+        </div>
+      </section>
+    </main>
 
-<footer class="site-footer">
-  <div class="container">
-    <p data-i18n="footerNote">
-      Live-Daten aus den öffentlichen GBFS-Feeds der Anbieter. Wo (noch) keine Live-Daten verfügbar sind, ist das beim
-      jeweiligen Anbieter gekennzeichnet.
-    </p>
-  </div>
-</footer>
+    <footer class="site-footer">
+      <div class="container">
+        <p data-i18n="footerNote">
+          Live-Daten aus den öffentlichen GBFS-Feeds der Anbieter. Wo (noch)
+          keine Live-Daten verfügbar sind, ist das beim jeweiligen Anbieter
+          gekennzeichnet.
+        </p>
+      </div>
+    </footer>
 
-<script src="js/app.js"></script>
-
-</body>
-
+    <script src="js/app.js"></script>
+  </body>
 </html>

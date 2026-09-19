@@ -30,71 +30,86 @@
  */
 
 (function () {
-  'use strict';
+  "use strict";
 
-  const STORAGE_KEY = '2rad-lang';
-  const DATA_URL = 'api/providers.php';
-  const GEO_URL = 'api/geo.php';
-  const SUPPORTED_LANGS = ['de', 'en', 'ko'];
+  const STORAGE_KEY = "2rad-lang";
+  const DATA_URL = "api/providers.php";
+  const GEO_URL = "api/geo.php";
+  const SUPPORTED_LANGS = ["de", "en", "ko"];
 
   const translations = {
     de: {
-      siteTitle: '2Rad Wächter Köln',
-      heroTitle: 'Alle Bike- & eScooter-Sharing-Anbieter in Köln',
-      heroSubtitle: 'Auf einen Blick: wie viele Fahrräder und eScooter aktuell in Köln zum Ausleihen verfügbar sind.',
-      lastUpdated: 'Stand:',
-      totalVehicles: 'Fahrzeuge insgesamt',
-      totalBikes: 'Fahrräder',
-      totalEscooters: 'eScooter',
-      providersHeading: 'Anbieter in Köln',
-      footerNote: 'Live-Daten aus den öffentlichen GBFS-Feeds der Anbieter. Wo (noch) keine Live-Daten verfügbar sind, ist das beim jeweiligen Anbieter gekennzeichnet.',
-      noDataLabel: 'Keine Live-Daten verfügbar',
-      typeBike: 'Fahrrad',
-      typeEscooter: 'eScooter',
-      bikesLabel: 'Räder',
-      escootersLabel: 'Scooter',
-      loading: 'Daten werden geladen …',
-      loadError: 'Daten konnten nicht geladen werden.',
-      themeToggleLabel: 'Farbschema wechseln'
+      siteTitle: "2Rad Wächter Köln",
+      heroTitle: "Alle Bike- & eScooter-Sharing-Anbieter in Köln",
+      heroSubtitle:
+        "Auf einen Blick: wie viele Fahrräder und eScooter aktuell in Köln zum Ausleihen verfügbar sind.",
+      lastUpdated: "Stand:",
+      totalVehicles: "Fahrzeuge insgesamt",
+      totalBikes: "Fahrräder",
+      totalEscooters: "eScooter",
+      providersHeading: "Anbieter in Köln",
+      footerNote:
+        "Live-Daten aus den öffentlichen GBFS-Feeds der Anbieter. Wo (noch) keine Live-Daten verfügbar sind, ist das beim jeweiligen Anbieter gekennzeichnet.",
+      noDataLabel: "Keine Live-Daten verfügbar",
+      typeBike: "Fahrrad",
+      typeEscooter: "eScooter",
+      bikesLabel: "Räder",
+      escootersLabel: "Scooter",
+      loading: "Daten werden geladen …",
+      loadError: "Daten konnten nicht geladen werden.",
+      themeToggleLabel: "Farbschema wechseln",
+      metaDescription:
+        "Alle Bike- und eScooter-Sharing-Anbieter in Köln auf einen Blick – mit aktueller Anzahl verfügbarer Fahrzeuge.",
+      ogLocale: "de_DE",
     },
     en: {
-      siteTitle: '2Wheel Guardian Cologne',
-      heroTitle: 'All bike- & eScooter-sharing providers in Cologne',
-      heroSubtitle: 'One overview of how many bikes and eScooters are currently available for rent in Cologne.',
-      lastUpdated: 'Last updated:',
-      totalVehicles: 'Vehicles in total',
-      totalBikes: 'Bikes',
-      totalEscooters: 'eScooters',
-      providersHeading: 'Providers in Cologne',
-      footerNote: 'Live data from each provider\'s public GBFS feed. Providers without live data (yet) are clearly marked as such.',
-      noDataLabel: 'No live data available',
-      typeBike: 'Bike',
-      typeEscooter: 'eScooter',
-      bikesLabel: 'Bikes',
-      escootersLabel: 'Scooters',
-      loading: 'Loading data …',
-      loadError: 'Could not load data.',
-      themeToggleLabel: 'Toggle color scheme'
+      siteTitle: "2Wheel Guardian Cologne",
+      heroTitle: "All bike- & eScooter-sharing providers in Cologne",
+      heroSubtitle:
+        "One overview of how many bikes and eScooters are currently available for rent in Cologne.",
+      lastUpdated: "Last updated:",
+      totalVehicles: "Vehicles in total",
+      totalBikes: "Bikes",
+      totalEscooters: "eScooters",
+      providersHeading: "Providers in Cologne",
+      footerNote:
+        "Live data from each provider's public GBFS feed. Providers without live data (yet) are clearly marked as such.",
+      noDataLabel: "No live data available",
+      typeBike: "Bike",
+      typeEscooter: "eScooter",
+      bikesLabel: "Bikes",
+      escootersLabel: "Scooters",
+      loading: "Loading data …",
+      loadError: "Could not load data.",
+      themeToggleLabel: "Toggle color scheme",
+      metaDescription:
+        "All bike- and eScooter-sharing providers in Cologne at a glance – with the current number of available vehicles.",
+      ogLocale: "en_US",
     },
     ko: {
-      siteTitle: '2Rääder Wächter Kölle',
-      heroTitle: 'All die Sharing-Anbieter för Rääder un eScooter en Kölle',
-      heroSubtitle: 'Jeck op Rääder? Hä kriss de op ene Blick, wie vill Rääder un eScooter jrad en Kölle ze han sin.',
-      lastUpdated: 'Stand:',
-      totalVehicles: 'Fahrzeuge insgesamt',
-      totalBikes: 'Rääder',
-      totalEscooters: 'eScooter',
-      providersHeading: 'Anbieter en Kölle',
-      footerNote: 'Live-Date us de öffentliche GBFS-Feeds vun de Anbieter. Wo (noch) keine Live-Date do sin, steiht dat bei däm Anbieter drusse.',
-      noDataLabel: 'Keine Live-Date do',
-      typeBike: 'Rääder',
-      typeEscooter: 'eScooter',
-      bikesLabel: 'Drohtesel',
-      escootersLabel: 'Scooter',
-      loading: 'Date wääde jelade …',
-      loadError: 'Date konnte nit jelade wääde.',
-      themeToggleLabel: 'Modus wähle'
-    }
+      siteTitle: "2Rääder Wächter Kölle",
+      heroTitle: "All die Sharing-Anbieter för Rääder un eScooter en Kölle",
+      heroSubtitle:
+        "Jeck op Rääder? Hä kriss de op ene Blick, wie vill Rääder un eScooter jrad en Kölle ze han sin.",
+      lastUpdated: "Stand:",
+      totalVehicles: "Fahrzeuge insgesamt",
+      totalBikes: "Rääder",
+      totalEscooters: "eScooter",
+      providersHeading: "Anbieter en Kölle",
+      footerNote:
+        "Live-Date us de öffentliche GBFS-Feeds vun de Anbieter. Wo (noch) keine Live-Date do sin, steiht dat bei däm Anbieter drusse.",
+      noDataLabel: "Keine Live-Date do",
+      typeBike: "Rääder",
+      typeEscooter: "eScooter",
+      bikesLabel: "Drohtesel",
+      escootersLabel: "Scooter",
+      loading: "Date wääde jelade …",
+      loadError: "Date konnte nit jelade wääde.",
+      themeToggleLabel: "Modus wähle",
+      metaDescription:
+        "All die Sharing-Anbieter för Rääder un eScooter en Kölle op ene Blick – met de aktuelle Zahl vun de Fahrzeuge, die grad do sin.",
+      ogLocale: "de_DE",
+    },
   };
 
   function normalizeLang(lang) {
@@ -105,15 +120,23 @@
     // navigator.userLanguage is deprecated/IE-only; kept purely as a last-resort
     // fallback for very old browsers where navigator.language is unavailable.
     // noinspection JSDeprecatedSymbols
-    const navLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
-    const navLangs = (navigator.languages && navigator.languages.length) ? navigator.languages : [navLang];
+    const navLang = (
+      navigator.language ||
+      navigator.userLanguage ||
+      ""
+    ).toLowerCase();
+    const navLangs =
+      navigator.languages && navigator.languages.length
+        ? navigator.languages
+        : [navLang];
     const isGerman = navLangs.some(function (l) {
-      return (l || '').toLowerCase().indexOf('de') === 0;
+      return (l || "").toLowerCase().indexOf("de") === 0;
     });
-    return isGerman ? 'de' : 'en';
+    return isGerman ? "de" : "en";
   }
 
-  let currentLang = normalizeLang(localStorage.getItem(STORAGE_KEY)) || detectBrowserLang();
+  let currentLang =
+    normalizeLang(localStorage.getItem(STORAGE_KEY)) || detectBrowserLang();
   let userHasChosen = !!normalizeLang(localStorage.getItem(STORAGE_KEY));
 
   function t(key) {
@@ -121,39 +144,61 @@
   }
 
   function updateLangButtons() {
-    const buttons = document.querySelectorAll('.lang-btn');
+    const buttons = document.querySelectorAll(".lang-btn");
     buttons.forEach(function (btn) {
-      btn.classList.toggle('active', btn.getAttribute('data-lang') === currentLang);
+      btn.classList.toggle(
+        "active",
+        btn.getAttribute("data-lang") === currentLang,
+      );
     });
   }
 
   function applyTranslations() {
-    document.documentElement.lang = currentLang === 'ko' ? 'de' : currentLang;
+    document.documentElement.lang = currentLang === "ko" ? "de" : currentLang;
 
     const titles = {
-      de: '2Rad Wächter Köln – Bike- & Scooter-Sharing im Überblick',
-      en: '2Wheel Guardian Cologne – Bike & Scooter Sharing at a Glance',
-      ko: '2Rad Wächter Kölle – Bike- & Scooter-Sharing op ene Blick'
+      de: "2Rad Wächter Köln – Bike- & Scooter-Sharing im Überblick",
+      en: "2Wheel Guardian Cologne – Bike & Scooter Sharing at a Glance",
+      ko: "2Rad Wächter Kölle – Bike- & Scooter-Sharing op ene Blick",
     };
     document.title = titles[currentLang] || titles.de;
+    updateMetaTags();
 
-    const nodes = document.querySelectorAll('[data-i18n]');
+    const nodes = document.querySelectorAll("[data-i18n]");
     nodes.forEach(function (node) {
-      const key = node.getAttribute('data-i18n');
+      const key = node.getAttribute("data-i18n");
       node.textContent = t(key);
     });
 
-    const ariaNodes = document.querySelectorAll('[data-i18n-aria]');
+    const ariaNodes = document.querySelectorAll("[data-i18n-aria]");
     ariaNodes.forEach(function (node) {
-      const key = node.getAttribute('data-i18n-aria');
-      node.setAttribute('aria-label', t(key));
+      const key = node.getAttribute("data-i18n-aria");
+      node.setAttribute("aria-label", t(key));
     });
 
     updateLangButtons();
   }
 
+  function setMetaContent(id, content) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.setAttribute("content", content);
+    }
+  }
+
+  function updateMetaTags() {
+    const description = t("metaDescription");
+    const title = document.title;
+    setMetaContent("meta-description", description);
+    setMetaContent("meta-og-title", title);
+    setMetaContent("meta-og-description", description);
+    setMetaContent("meta-og-locale", t("ogLocale"));
+    setMetaContent("meta-twitter-title", title);
+    setMetaContent("meta-twitter-description", description);
+  }
+
   function setLanguage(lang, fromUser) {
-    currentLang = normalizeLang(lang) || 'de';
+    currentLang = normalizeLang(lang) || "de";
     if (fromUser) {
       userHasChosen = true;
       localStorage.setItem(STORAGE_KEY, currentLang);
@@ -165,15 +210,17 @@
   }
 
   function formatNumber(n) {
-    const locale = currentLang === 'en' ? 'en-US' : 'de-DE';
+    const locale = currentLang === "en" ? "en-US" : "de-DE";
     return new Intl.NumberFormat(locale).format(n);
   }
 
   function typeBadges(types) {
-    return types.map(function (type) {
-      const label = type === 'bike' ? t('typeBike') : t('typeEscooter');
-      return '<span class="provider-type-badge">' + label + '</span>';
-    }).join('');
+    return types
+      .map(function (type) {
+        const label = type === "bike" ? t("typeBike") : t("typeEscooter");
+        return '<span class="provider-type-badge">' + label + "</span>";
+      })
+      .join("");
   }
 
   /**
@@ -193,21 +240,28 @@
       totalEscooters += p.escooters || 0;
     });
 
-    document.getElementById('total-bikes').textContent = formatNumber(totalBikes);
-    document.getElementById('total-escooters').textContent = formatNumber(totalEscooters);
-    document.getElementById('total-vehicles').textContent = formatNumber(totalBikes + totalEscooters);
+    document.getElementById("total-bikes").textContent =
+      formatNumber(totalBikes);
+    document.getElementById("total-escooters").textContent =
+      formatNumber(totalEscooters);
+    document.getElementById("total-vehicles").textContent = formatNumber(
+      totalBikes + totalEscooters,
+    );
 
-    const updatedEl = document.getElementById('updated-time');
+    const updatedEl = document.getElementById("updated-time");
     if (data.updated) {
       const d = new Date(data.updated);
-      const locale = currentLang === 'en' ? 'en-US' : 'de-DE';
+      const locale = currentLang === "en" ? "en-US" : "de-DE";
       updatedEl.dateTime = data.updated;
       /** @type {Intl.DateTimeFormatOptions} */
-      const dateTimeOptions = {dateStyle: 'medium', timeStyle: 'short'};
-      updatedEl.textContent = new Intl.DateTimeFormat(locale, dateTimeOptions).format(d);
+      const dateTimeOptions = { dateStyle: "medium", timeStyle: "short" };
+      updatedEl.textContent = new Intl.DateTimeFormat(
+        locale,
+        dateTimeOptions,
+      ).format(d);
     }
 
-    const grid = document.getElementById('provider-grid');
+    const grid = document.getElementById("provider-grid");
     grid.innerHTML = providers
       .slice()
       .sort(function (/** @type {Provider} */ a, /** @type {Provider} */ b) {
@@ -220,37 +274,53 @@
         if (!b.available) {
           return -1;
         }
-        return (b.bikes + b.escooters) - (a.bikes + a.escooters);
+        return b.bikes + b.escooters - (a.bikes + a.escooters);
       })
       .map(function (/** @type {Provider} */ p) {
         const counts = p.available
-          ? (
-            '<div class="provider-counts">' +
-            '<div><strong>' + formatNumber(p.bikes || 0) + '</strong>' + t('bikesLabel') + '</div>' +
-            '<div><strong>' + formatNumber(p.escooters || 0) + '</strong>' + t('escootersLabel') + '</div>' +
-            '</div>'
-          )
-          : '<div class="provider-counts provider-counts--unavailable">' + t('noDataLabel') + '</div>';
+          ? '<div class="provider-counts">' +
+            "<div><strong>" +
+            formatNumber(p.bikes || 0) +
+            "</strong>" +
+            t("bikesLabel") +
+            "</div>" +
+            "<div><strong>" +
+            formatNumber(p.escooters || 0) +
+            "</strong>" +
+            t("escootersLabel") +
+            "</div>" +
+            "</div>"
+          : '<div class="provider-counts provider-counts--unavailable">' +
+            t("noDataLabel") +
+            "</div>";
 
         return (
-          '<article class="provider-card' + (p.available ? '' : ' provider-card--unavailable') + '" style="--provider-color: ' + (p.color || '#ef0000') + '">' +
-          '<h3>' + p.name + '</h3>' +
-          '<div class="provider-types">' + typeBadges(p.types || []) + '</div>' +
+          '<article class="provider-card' +
+          (p.available ? "" : " provider-card--unavailable") +
+          '" style="--provider-color: ' +
+          (p.color || "#ef0000") +
+          '">' +
+          "<h3>" +
+          p.name +
+          "</h3>" +
+          '<div class="provider-types">' +
+          typeBadges(p.types || []) +
+          "</div>" +
           counts +
-          '</article>'
+          "</article>"
         );
       })
-      .join('');
+      .join("");
   }
 
   function loadData() {
-    const grid = document.getElementById('provider-grid');
-    grid.innerHTML = '<p>' + t('loading') + '</p>';
+    const grid = document.getElementById("provider-grid");
+    grid.innerHTML = "<p>" + t("loading") + "</p>";
 
-    fetch(DATA_URL, {cache: 'no-store'})
+    fetch(DATA_URL, { cache: "no-store" })
       .then(function (res) {
         if (!res.ok) {
-          throw new Error('HTTP ' + res.status);
+          throw new Error("HTTP " + res.status);
         }
         return res.json();
       })
@@ -259,8 +329,8 @@
         renderProviders(data);
       })
       .catch(function (err) {
-        console.error('Failed to load provider data:', err);
-        grid.innerHTML = '<p>' + t('loadError') + '</p>';
+        console.error("Failed to load provider data:", err);
+        grid.innerHTML = "<p>" + t("loadError") + "</p>";
       });
   }
 
@@ -269,41 +339,47 @@
     if (userHasChosen) {
       return;
     }
-    fetch(GEO_URL, {cache: 'no-store'})
+    fetch(GEO_URL, { cache: "no-store" })
       .then(function (res) {
         if (!res.ok) {
-          throw new Error('HTTP ' + res.status);
+          throw new Error("HTTP " + res.status);
         }
         return res.json();
       })
       .then(function (geo) {
         if (!userHasChosen && geo && geo.isCologne) {
-          setLanguage('ko', false);
+          setLanguage("ko", false);
         }
       })
       .catch(function (err) {
-        console.warn('Geo detection unavailable:', err);
+        console.warn("Geo detection unavailable:", err);
       });
   }
 
   // --- Dark mode -------------------------------------------------------
 
-  const THEME_STORAGE_KEY = '2rad-theme';
-  const darkModeQuery = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  const THEME_STORAGE_KEY = "2rad-theme";
+  const darkModeQuery = window.matchMedia
+    ? window.matchMedia("(prefers-color-scheme: dark)")
+    : null;
 
   function getSystemTheme() {
-    return darkModeQuery && darkModeQuery.matches ? 'dark' : 'light';
+    return darkModeQuery && darkModeQuery.matches ? "dark" : "light";
   }
 
   let themeUserHasChosen = !!localStorage.getItem(THEME_STORAGE_KEY);
-  let currentTheme = localStorage.getItem(THEME_STORAGE_KEY) || getSystemTheme();
+  let currentTheme =
+    localStorage.getItem(THEME_STORAGE_KEY) || getSystemTheme();
 
   function applyTheme(theme) {
-    currentTheme = theme === 'dark' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', currentTheme);
-    const toggle = document.getElementById('theme-toggle');
+    currentTheme = theme === "dark" ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", currentTheme);
+    const toggle = document.getElementById("theme-toggle");
     if (toggle) {
-      toggle.setAttribute('aria-pressed', currentTheme === 'dark' ? 'true' : 'false');
+      toggle.setAttribute(
+        "aria-pressed",
+        currentTheme === "dark" ? "true" : "false",
+      );
     }
   }
 
@@ -318,10 +394,10 @@
   function initTheme() {
     applyTheme(currentTheme);
 
-    const toggle = document.getElementById('theme-toggle');
+    const toggle = document.getElementById("theme-toggle");
     if (toggle) {
-      toggle.addEventListener('click', function () {
-        setTheme(currentTheme === 'dark' ? 'light' : 'dark', true);
+      toggle.addEventListener("click", function () {
+        setTheme(currentTheme === "dark" ? "light" : "dark", true);
       });
     }
 
@@ -333,10 +409,10 @@
       const handleSystemChange = function (e) {
         themeUserHasChosen = false;
         localStorage.removeItem(THEME_STORAGE_KEY);
-        applyTheme(e.matches ? 'dark' : 'light');
+        applyTheme(e.matches ? "dark" : "light");
       };
       if (darkModeQuery.addEventListener) {
-        darkModeQuery.addEventListener('change', handleSystemChange);
+        darkModeQuery.addEventListener("change", handleSystemChange);
       } else {
         // MediaQueryList.addListener is deprecated (replaced by addEventListener),
         // kept only as a fallback for Safari < 14 / very old browsers.
@@ -349,13 +425,13 @@
     }
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener("DOMContentLoaded", function () {
     applyTranslations();
     initTheme();
 
-    document.querySelectorAll('.lang-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        setLanguage(btn.getAttribute('data-lang'), true);
+    document.querySelectorAll(".lang-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        setLanguage(btn.getAttribute("data-lang"), true);
       });
     });
 
