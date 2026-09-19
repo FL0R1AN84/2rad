@@ -61,6 +61,7 @@
       metaDescription:
         "Alle Bike- und eScooter-Sharing-Anbieter in Köln auf einen Blick – mit aktueller Anzahl verfügbarer Fahrzeuge.",
       ogLocale: "de_DE",
+      versionLabel: "Version:",
     },
     en: {
       siteTitle: "2Wheel Guardian Cologne",
@@ -85,6 +86,7 @@
       metaDescription:
         "All bike- and eScooter-sharing providers in Cologne at a glance – with the current number of available vehicles.",
       ogLocale: "en_US",
+      versionLabel: "Version:",
     },
     ko: {
       siteTitle: "2Rääder Wächter Kölle",
@@ -109,6 +111,7 @@
       metaDescription:
         "All die Sharing-Anbieter för Rääder un eScooter en Kölle op ene Blick – met de aktuelle Zahl vun de Fahrzeuge, die grad do sin.",
       ogLocale: "de_DE",
+      versionLabel: "Version:",
     },
   };
 
