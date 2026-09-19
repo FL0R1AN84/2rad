@@ -344,6 +344,58 @@ html[data-theme="dark"] .theme-toggle .icon-sun {
   }
 }
 
+.error-page {
+  text-align: center;
+  padding: 3rem 1.25rem 4rem;
+}
+
+.error-logo {
+  margin: 0 auto 1.5rem;
+}
+
+.error-logo img {
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: var(--shadow-card);
+  padding: 0.5rem;
+}
+
+.error-code {
+  font-size: 4.5rem;
+  font-weight: 800;
+  color: var(--color-primary);
+  line-height: 1;
+  margin: 0 0 0.5rem;
+}
+
+.error-page h1 {
+  font-size: 1.5rem;
+  margin: 0 auto 0.75rem;
+  max-width: 560px;
+}
+
+.error-page .subtitle {
+  color: var(--color-text-muted);
+  font-size: 1.05rem;
+  max-width: 520px;
+  margin: 0 auto 2rem;
+}
+
+.btn-home {
+  display: inline-block;
+  background: var(--color-primary);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  padding: 0.75rem 1.75rem;
+  border-radius: 999px;
+  transition: opacity 0.15s ease;
+}
+
+.btn-home:hover {
+  opacity: 0.85;
+}
+
 /* ==========================================================================
    Print styles
    ========================================================================== */
