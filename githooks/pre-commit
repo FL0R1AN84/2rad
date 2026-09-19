@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Bumps the <span id="app-version"> stamp in index.html to the current
+# timestamp whenever a commit touches html/css/js/php source files.
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+changed="$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(html|css|js|php)$' || true)"
+if [ -z "$changed" ]; then
+  exit 0
+fi
+
+version="$(date +"%Y.%m.%d.%H%M")"
+perl -0pi -e "s{(<span id=\"app-version\">)[^<]*(</span>)}{\${1}${version}\${2}}" index.html
+git add index.html
