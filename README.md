@@ -10,7 +10,7 @@ for deployment on a Plesk server.
 > **Status:** provider data is backed entirely by real **GBFS** (General
 > Bikeshare Feed Specification) feeds — this app never shows made-up
 > numbers. KVB Rad, Call a Bike, Dott, Voi and Bolt currently have live
-> feeds for Cologne; Ryde, Lime and TIER don't have a known
+> feeds for Cologne; Ryde, Lime, TIER and RideMovi don't have a known
 > public feed for Cologne yet and are shown as **"no live data available"**
 > instead of a fabricated figure until one is found or provided.
 
@@ -79,9 +79,7 @@ differently).
     {
       "id": "kvb-rad",
       "name": "KVB Rad",
-      "types": [
-        "bike"
-      ],
+      "types": ["bike"],
       "bikes": 1250,
       "escooters": 0,
       "color": "#004b93",
@@ -91,9 +89,7 @@ differently).
     {
       "id": "tier",
       "name": "TIER",
-      "types": [
-        "escooter"
-      ],
+      "types": ["escooter"],
       "bikes": null,
       "escooters": null,
       "color": "#1b1b1b",
@@ -111,7 +107,7 @@ Vehicle counts are fetched from each provider's public
 `api/config/providers.php`:
 
 | Provider    | Feed                                                                          | Notes                                                                                                     |
-|-------------|-------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------|
+| ----------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | KVB Rad     | `nextbike_kg` (nextbike)                                                      | Cologne-only, station-based                                                                               |
 | Call a Bike | `callabike` (mobidata-bw)                                                     | Nationwide feed, filtered to a Cologne bounding box                                                       |
 | Voi         | MOBIDROM Voi Köln (preferred, needs auth), or `voi_de` (mobidata-bw) fallback | Cologne-only via MOBIDROM; nationwide+bbox-filtered otherwise; see below                                  |
@@ -119,6 +115,7 @@ Vehicle counts are fetched from each provider's public
 | Dott        | `cologne` (ridedott.com)                                                      | Cologne-only, free-floating                                                                               |
 | Ryde, TIER  | –                                                                             | No known public feed for Cologne yet; reported as unavailable                                             |
 | Lime        | –                                                                             | MOBIDROM's `lime-nrw` dataset exists but only covers Dortmund/Essen, not Cologne; reported as unavailable |
+| RideMovi    | –                                                                             | No known public feed for Cologne yet; reported as unavailable                                             |
 
 Results are cached in `api/cache/gbfs_cache.json` for two minutes (`CACHE_TTL_SECONDS` in `api/lib/cache.php`) to avoid
 hammering upstream
@@ -156,7 +153,7 @@ Keycloak token endpoint isn't hit on every request.
 
 **Setting `MOBIDROM_GBFS_CLIENT_SECRET` on Plesk:**
 
-1. **Preferred (real PHP-FPM env variable):** *Websites & Domains* → your
+1. **Preferred (real PHP-FPM env variable):** _Websites & Domains_ → your
    domain → **PHP Settings** → make sure "PHP support" is set to a
    "FPM application" handler → in the **"Additional configuration
    directives"** box (applies to the php-fpm pool), add:

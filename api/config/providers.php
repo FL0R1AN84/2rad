@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Provider configuration: which GBFS feed (if any) backs each provider.
  * There is no dummy/fake data anywhere in this app: providers without a
@@ -190,6 +191,13 @@ function get_provider_config(): array
                 'bbox' => null, // Cologne-only system already.
                 'default_form_factor' => 'scooter',
             ],
+        ],
+        [
+            'id' => 'ridemovi',
+            'name' => 'RideMovi',
+            'types' => ['escooter'],
+            'color' => '#ff4611',
+            'source' => ['type' => 'scooter'], // no public feed for Cologne yet.
         ],
     ];
 }
