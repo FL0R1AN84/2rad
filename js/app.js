@@ -15,8 +15,10 @@
  * @property {string} id
  * @property {string} name
  * @property {string[]} types
- * @property {?number} bikes         null when `available` is false
- * @property {?number} escooters     null when `available` is false
+ * @property {?number} bikes         currently available bikes
+ * @property {?number} escooters     currently available eScooters
+ * @property {?number} bikes_fleet   bikes listed in the feed, including unavailable ones when listed
+ * @property {?number} escooters_fleet eScooters listed in the feed, including unavailable ones when listed
  * @property {string} color
  * @property {boolean} live          whether the reading is a real (or last known-good) GBFS value
  * @property {boolean} available     whether this provider has any live data at all
@@ -44,9 +46,9 @@
       heroSubtitle:
         "Auf einen Blick: wie viele Fahrräder und eScooter aktuell in Köln zum Ausleihen verfügbar sind.",
       lastUpdated: "Stand:",
-      totalVehicles: "Fahrzeuge insgesamt",
-      totalBikes: "Fahrräder",
-      totalEscooters: "eScooter",
+      totalVehicles: "Fahrzeuge verfügbar",
+      totalBikes: "Fahrräder verfügbar",
+      totalEscooters: "eScooter verfügbar",
       providersHeading: "Anbieter in Köln",
       footerNote:
         "Live-Daten aus den öffentlichen GBFS-Feeds der Anbieter. Wo (noch) keine Live-Daten verfügbar sind, ist das beim jeweiligen Anbieter gekennzeichnet.",
@@ -55,6 +57,10 @@
       typeEscooter: "eScooter",
       bikesLabel: "Räder",
       escootersLabel: "Scooter",
+      fleetLabel: "Flotte",
+      availableLabel: "Verfügbar",
+      fleetNote:
+        "Flotte = alle vom Feed gemeldeten Fahrzeuge (kann unvollständig sein); verfügbar = aktuell mietbar.",
       loading: "Daten werden geladen …",
       loadError: "Daten konnten nicht geladen werden.",
       themeToggleLabel: "Farbschema wechseln",
@@ -69,9 +75,9 @@
       heroSubtitle:
         "One overview of how many bikes and eScooters are currently available for rent in Cologne.",
       lastUpdated: "Last updated:",
-      totalVehicles: "Vehicles in total",
-      totalBikes: "Bikes",
-      totalEscooters: "eScooters",
+      totalVehicles: "Vehicles available",
+      totalBikes: "Bikes available",
+      totalEscooters: "eScooters available",
       providersHeading: "Providers in Cologne",
       footerNote:
         "Live data from each provider's public GBFS feed. Providers without live data (yet) are clearly marked as such.",
@@ -80,6 +86,10 @@
       typeEscooter: "eScooter",
       bikesLabel: "Bikes",
       escootersLabel: "Scooters",
+      fleetLabel: "Fleet",
+      availableLabel: "Available",
+      fleetNote:
+        "Fleet = all vehicles reported by the feed (may be incomplete); available = currently rentable.",
       loading: "Loading data …",
       loadError: "Could not load data.",
       themeToggleLabel: "Toggle color scheme",
@@ -94,9 +104,9 @@
       heroSubtitle:
         "Jeck op Rääder? Hä kriss de op ene Blick, wie vill Rääder un eScooter jrad en Kölle ze han sin.",
       lastUpdated: "Stand:",
-      totalVehicles: "Fahrzeuge insgesamt",
-      totalBikes: "Rääder",
-      totalEscooters: "eScooter",
+      totalVehicles: "Fahrzeuge ze han",
+      totalBikes: "Rääder ze han",
+      totalEscooters: "eScooter ze han",
       providersHeading: "Anbieter en Kölle",
       footerNote:
         "Live-Date us de öffentliche GBFS-Feeds vun de Anbieter. Wo (noch) keine Live-Date do sin, steiht dat bei däm Anbieter drusse.",
@@ -105,6 +115,10 @@
       typeEscooter: "eScooter",
       bikesLabel: "Drohtesel",
       escootersLabel: "Scooter",
+      fleetLabel: "Flott",
+      availableLabel: "Ze han",
+      fleetNote:
+        "Flott = all Fahrzeuge, die dä Feed mäldt (kann unvollständig sin); ze han = jrad ze miete.",
       loading: "Date wääde jelade …",
       loadError: "Date konnte nit jelade wääde.",
       themeToggleLabel: "Modus wähle",
@@ -282,16 +296,32 @@
       .map(function (/** @type {Provider} */ p) {
         const counts = p.available
           ? '<div class="provider-counts">' +
-            "<div><strong>" +
-            formatNumber(p.bikes || 0) +
-            "</strong>" +
+            '<div class="provider-count-group"><h4>' +
             t("bikesLabel") +
-            "</div>" +
-            "<div><strong>" +
-            formatNumber(p.escooters || 0) +
-            "</strong>" +
+            "</h4>" +
+            '<div><span>' +
+            t("fleetLabel") +
+            "</span><strong>" +
+            formatNullableNumber(p.bikes_fleet) +
+            "</strong></div>" +
+            '<div><span>' +
+            t("availableLabel") +
+            "</span><strong>" +
+            formatNumber(p.bikes || 0) +
+            "</strong></div></div>" +
+            '<div class="provider-count-group"><h4>' +
             t("escootersLabel") +
-            "</div>" +
+            "</h4>" +
+            '<div><span>' +
+            t("fleetLabel") +
+            "</span><strong>" +
+            formatNullableNumber(p.escooters_fleet) +
+            "</strong></div>" +
+            '<div><span>' +
+            t("availableLabel") +
+            "</span><strong>" +
+            formatNumber(p.escooters || 0) +
+            "</strong></div></div>" +
             "</div>"
           : '<div class="provider-counts provider-counts--unavailable">' +
             t("noDataLabel") +
@@ -314,6 +344,10 @@
         );
       })
       .join("");
+  }
+
+  function formatNullableNumber(value) {
+    return value === null || value === undefined ? "–" : formatNumber(value);
   }
 
   function loadData() {

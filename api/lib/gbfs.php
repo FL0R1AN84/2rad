@@ -3,7 +3,7 @@
  * Small GBFS (General Bikeshare Feed Specification) client.
  *
  * Only implements the bits needed to turn a provider's GBFS auto-discovery
- * feed into a simple ['bikes' => int, 'escooters' => int] count:
+ * feed into available and feed-listed fleet counts:
  *  - station-based systems (station_information.json + station_status.json)
  *  - free-floating systems (free_bike_status.json, optionally vehicle_types.json)
  *
@@ -120,10 +120,11 @@ function gbfs_classify_form_factor(?string $formFactor): string
 }
 
 /**
- * Sum available vehicles across a station-based GBFS system.
- * Returns null if the feed could not be read.
+ * Count available and feed-reported vehicles across a station-based system.
+ * Disabled vehicles are included in the feed-reported fleet total when the
+ * feed exposes their count. Returns null if the feed could not be read.
  */
-function gbfs_count_stations(string $discoveryUrl, ?array $bbox = null, ?string $bearerToken = null): ?int
+function gbfs_count_stations(string $discoveryUrl, ?array $bbox = null, ?string $bearerToken = null): ?array
 {
     $discovery = gbfs_fetch_json($discoveryUrl, $bearerToken);
     if ($discovery === null) {
@@ -153,7 +154,8 @@ function gbfs_count_stations(string $discoveryUrl, ?array $bbox = null, ?string 
         }
     }
 
-    $count = 0;
+    $available = 0;
+    $fleet = 0;
     foreach ($stations as $station) {
         if ($bbox !== null) {
             [$lat, $lon] = $positions[$station['station_id'] ?? null] ?? [null, null];
@@ -161,22 +163,30 @@ function gbfs_count_stations(string $discoveryUrl, ?array $bbox = null, ?string 
                 continue;
             }
         }
-        // GBFS 1.x/2.x uses num_bikes_available, GBFS 3.x uses num_vehicles_available.
-        $count += (int) ($station['num_vehicles_available'] ?? $station['num_bikes_available'] ?? 0);
+        // GBFS 1.x/2.x uses num_bikes_*; GBFS 3.x uses num_vehicles_*.
+        $stationAvailable = (int) ($station['num_vehicles_available'] ?? $station['num_bikes_available'] ?? 0);
+        $stationDisabled = (int) ($station['num_vehicles_disabled'] ?? $station['num_bikes_disabled'] ?? 0);
+        $available += $stationAvailable;
+        $fleet += $stationAvailable + $stationDisabled;
     }
 
-    return $count;
+    return [
+        'bikes' => $available,
+        'escooters' => 0,
+        'bikes_fleet' => $fleet,
+        'escooters_fleet' => 0,
+    ];
 }
 
 /**
- * Count available free-floating vehicles (bikes vs. escooters) for a
- * GBFS system, optionally restricted to a bounding box (for nationwide
+ * Count available and feed-listed free-floating vehicles (bikes vs.
+ * escooters) for a GBFS system, optionally restricted to a bounding box (for nationwide
  * feeds such as Call a Bike or Voi that need filtering down to Cologne).
  *
  * $defaultFormFactor is used when the feed has no vehicle_types.json
  * (older GBFS versions) to classify all vehicles as bike/escooter.
  *
- * Returns ['bikes' => int, 'escooters' => int] or null on failure.
+ * Returns available counts plus feed-listed fleet counts, or null on failure.
  */
 function gbfs_count_free_floating(string $discoveryUrl, ?array $bbox, string $defaultFormFactor, ?string $bearerToken = null): ?array
 {
@@ -212,10 +222,9 @@ function gbfs_count_free_floating(string $discoveryUrl, ?array $bbox, string $de
 
     $bikes = 0;
     $escooters = 0;
+    $bikesFleet = 0;
+    $escootersFleet = 0;
     foreach ($vehicles as $vehicle) {
-        if (!empty($vehicle['is_disabled']) || !empty($vehicle['is_reserved'])) {
-            continue;
-        }
         if (!gbfs_in_bbox($bbox, $vehicle['lat'] ?? null, $vehicle['lon'] ?? null)) {
             continue;
         }
@@ -223,14 +232,25 @@ function gbfs_count_free_floating(string $discoveryUrl, ?array $bbox, string $de
         $formFactor = $formFactorByTypeId[$vehicle['vehicle_type_id'] ?? null] ?? $defaultFormFactor;
         switch (gbfs_classify_form_factor($formFactor)) {
             case 'bike':
-                $bikes++;
+                $bikesFleet++;
+                if (empty($vehicle['is_disabled']) && empty($vehicle['is_reserved'])) {
+                    $bikes++;
+                }
                 break;
             case 'escooter':
-                $escooters++;
+                $escootersFleet++;
+                if (empty($vehicle['is_disabled']) && empty($vehicle['is_reserved'])) {
+                    $escooters++;
+                }
                 break;
             // Other form factors (car, other, ...) aren't tracked by this site.
         }
     }
 
-    return ['bikes' => $bikes, 'escooters' => $escooters];
+    return [
+        'bikes' => $bikes,
+        'escooters' => $escooters,
+        'bikes_fleet' => $bikesFleet,
+        'escooters_fleet' => $escootersFleet,
+    ];
 }

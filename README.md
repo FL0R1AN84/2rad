@@ -82,6 +82,8 @@ differently).
       "types": ["bike"],
       "bikes": 1250,
       "escooters": 0,
+      "bikes_fleet": 1310,
+      "escooters_fleet": 0,
       "color": "#004b93",
       "live": true,
       "available": true
@@ -92,6 +94,8 @@ differently).
       "types": ["escooter"],
       "bikes": null,
       "escooters": null,
+      "bikes_fleet": null,
+      "escooters_fleet": null,
       "color": "#1b1b1b",
       "live": false,
       "available": false
@@ -99,6 +103,13 @@ differently).
   ]
 }
 ```
+
+`bikes` and `escooters` are currently available vehicles and are used for the
+overall totals. `bikes_fleet` and `escooters_fleet` count vehicles reported by
+the feed, including disabled/reserved vehicles when the feed lists them. A
+feed may omit vehicles that are out of service, so these fleet figures are not
+necessarily the operator's complete fleet size. They are `null` when no fleet
+count is present (for example when serving an older cached response).
 
 #### Live data sources (GBFS)
 
