@@ -5,8 +5,8 @@
  * Live vehicle counts are fetched from each provider's public GBFS feed
  * (see api/config/providers.php) where available. This app never shows
  * dummy/fake numbers: providers without a working live feed are reported
- * with counts = null and available = false, so the frontend can show this
- * clearly instead of pretending to have real figures.
+ * with bikes/escooters = null and available = false, so the frontend can
+ * show this clearly instead of pretending to have real figures.
  *
  * Resolution order per provider, so the site stays usable even if a feed
  * is slow or temporarily down:
@@ -71,7 +71,8 @@ function fetch_live_counts(string $providerId, array $source): ?array
 
     switch ($source['type']) {
         case 'gbfs-stations':
-            return gbfs_count_stations($source['discovery_url'], $source['bbox'] ?? null, $bearerToken);
+            $count = gbfs_count_stations($source['discovery_url'], $source['bbox'] ?? null, $bearerToken);
+            return $count === null ? null : ['bikes' => $count, 'escooters' => 0];
 
         case 'gbfs-free-floating':
             return gbfs_count_free_floating(
@@ -96,16 +97,8 @@ foreach (get_provider_config() as $config) {
 
     if ($config['source']['type'] !== 'static') {
         $fresh = cache_get_fresh($cache, $config['id']);
-        if ($fresh !== null
-            && array_key_exists('bikes_fleet', $fresh)
-            && array_key_exists('escooters_fleet', $fresh)
-        ) {
-            $counts = [
-                'bikes' => $fresh['bikes'],
-                'escooters' => $fresh['escooters'],
-                'bikes_fleet' => $fresh['bikes_fleet'] ?? null,
-                'escooters_fleet' => $fresh['escooters_fleet'] ?? null,
-            ];
+        if ($fresh !== null) {
+            $counts = ['bikes' => $fresh['bikes'], 'escooters' => $fresh['escooters']];
             $isLive = true;
         } else {
             $live = fetch_live_counts($config['id'], $config['source']);
@@ -117,12 +110,7 @@ foreach (get_provider_config() as $config) {
             } else {
                 $stale = cache_get_stale($cache, $config['id']);
                 if ($stale !== null) {
-                    $counts = [
-                        'bikes' => $stale['bikes'],
-                        'escooters' => $stale['escooters'],
-                        'bikes_fleet' => $stale['bikes_fleet'] ?? null,
-                        'escooters_fleet' => $stale['escooters_fleet'] ?? null,
-                    ];
+                    $counts = ['bikes' => $stale['bikes'], 'escooters' => $stale['escooters']];
                     $isLive = true;
                 }
             }
@@ -136,8 +124,6 @@ foreach (get_provider_config() as $config) {
             'types' => $config['types'],
             'bikes' => null,
             'escooters' => null,
-            'bikes_fleet' => null,
-            'escooters_fleet' => null,
             'color' => $config['color'],
             'live' => false,
             'available' => false,
@@ -152,8 +138,6 @@ foreach (get_provider_config() as $config) {
         'types' => $config['types'],
         'bikes' => $counts['bikes'],
         'escooters' => $counts['escooters'],
-        'bikes_fleet' => $counts['bikes_fleet'] ?? null,
-        'escooters_fleet' => $counts['escooters_fleet'] ?? null,
         'color' => $config['color'],
         'live' => $isLive,
         'available' => true,
