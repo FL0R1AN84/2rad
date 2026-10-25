@@ -108,7 +108,7 @@ Vehicle counts are fetched from each provider's public
 
 | Provider    | Feed                                                                          | Notes                                                                                                     |
 | ----------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| KVB Rad     | `nextbike_kg` (nextbike)                                                      | Cologne-only, station-based                                                                               |
+| KVB Rad     | `nextbike_kg` (nextbike)                                                      | Cologne-only; station bikes plus free-floating bikes (`free_bike_status` without `station_id`)            |
 | Call a Bike | `callabike` (mobidata-bw)                                                     | Nationwide feed, filtered to a Cologne bounding box                                                       |
 | Voi         | MOBIDROM Voi Köln (preferred, needs auth), or `voi_de` (mobidata-bw) fallback | Cologne-only via MOBIDROM; nationwide+bbox-filtered otherwise; see below                                  |
 | Bolt        | MOBIDROM Bolt Köln-Bonn (needs auth)                                          | Combined Köln+Bonn dataset, filtered to a Cologne bounding box                                            |

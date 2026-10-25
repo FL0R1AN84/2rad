@@ -120,7 +120,8 @@ function gbfs_classify_form_factor(?string $formFactor): string
 }
 
 /**
- * Sum available vehicles across a station-based GBFS system.
+ * Sum available vehicles across a station-based GBFS system, plus any
+ * free-floating (station-less) vehicles listed in its free_bike_status feed.
  * Returns null if the feed could not be read.
  */
 function gbfs_count_stations(string $discoveryUrl, ?array $bbox = null, ?string $bearerToken = null): ?int
@@ -163,6 +164,27 @@ function gbfs_count_stations(string $discoveryUrl, ?array $bbox = null, ?string 
         }
         // GBFS 1.x/2.x uses num_bikes_available, GBFS 3.x uses num_vehicles_available.
         $count += (int) ($station['num_vehicles_available'] ?? $station['num_bikes_available'] ?? 0);
+    }
+
+    // Hybrid systems (e.g. nextbike) also list free-floating bikes that
+    // aren't docked at any station; station_status doesn't include them.
+    // Bikes with a station_id are already part of the station count above.
+    $freeUrl = gbfs_resolve_feed_url($discovery, 'free_bike_status')
+        ?? gbfs_resolve_feed_url($discovery, 'vehicle_status');
+    if ($freeUrl !== null) {
+        $freeData = gbfs_fetch_json($freeUrl, $bearerToken);
+        $bikes = $freeData['data']['bikes'] ?? $freeData['data']['vehicles'] ?? null;
+        if (!is_array($bikes)) {
+            return null; // don't report an undercount (and cache it) on a failed fetch.
+        }
+        foreach ($bikes as $bike) {
+            if (!empty($bike['station_id']) || !empty($bike['is_disabled']) || !empty($bike['is_reserved'])) {
+                continue;
+            }
+            if (gbfs_in_bbox($bbox, $bike['lat'] ?? null, $bike['lon'] ?? null)) {
+                $count++;
+            }
+        }
     }
 
     return $count;
