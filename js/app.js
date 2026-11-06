@@ -301,7 +301,7 @@
           '<article class="provider-card' +
           (p.available ? "" : " provider-card--unavailable") +
           '" style="--provider-color: ' +
-          (p.color || "#ef0000") +
+          (p.color || "var(--color-brand)") +
           '">' +
           "<h3>" +
           p.name +
