@@ -155,16 +155,9 @@ function get_provider_config(): array
             'name' => 'Lime',
             'types' => ['escooter', 'bike'],
             'color' => '#00b100',
-            // MOBIDROM's "lime-nrw" dataset exists but only covers Dortmund
-            // and Essen (no Cologne system as of Sept. 2026) — not usable here.
+            // MOBIDROM lists Dortmund, Essen and bundled NRW data, but no
+            // verified Cologne GBFS URL is configured here.
             'source' => ['type' => 'static'],
-        ],
-        [
-            'id' => 'tier',
-            'name' => 'TIER',
-            'types' => ['escooter'],
-            'color' => '#1b1b1b',
-            'source' => ['type' => 'static'], // no public feed for Cologne yet.
         ],
         [
             'id' => 'bolt',

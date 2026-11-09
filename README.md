@@ -10,7 +10,7 @@ for deployment on a Plesk server.
 > **Status:** provider data is backed entirely by real **GBFS** (General
 > Bikeshare Feed Specification) feeds — this app never shows made-up
 > numbers. KVB Rad, Call a Bike, Dott, Voi and Bolt currently have live
-> feeds for Cologne; Ryde, Lime, TIER and RideMovi don't have a known
+> feeds for Cologne; Ryde, Lime and RideMovi don't have a known
 > public feed for Cologne yet and are shown as **"no live data available"**
 > instead of a fabricated figure until one is found or provided.
 
@@ -87,12 +87,12 @@ differently).
       "available": true
     },
     {
-      "id": "tier",
-      "name": "TIER",
+      "id": "ryde",
+      "name": "Ryde",
       "types": ["escooter"],
       "bikes": null,
       "escooters": null,
-      "color": "#1b1b1b",
+      "color": "#3ea219",
       "live": false,
       "available": false
     }
@@ -112,9 +112,9 @@ Vehicle counts are fetched from each provider's public
 | Call a Bike | `callabike` (mobidata-bw)                                                     | Nationwide feed, filtered to a Cologne bounding box                                                       |
 | Voi         | MOBIDROM Voi Köln (preferred, needs auth), or `voi_de` (mobidata-bw) fallback | Cologne-only via MOBIDROM; nationwide+bbox-filtered otherwise; see below                                  |
 | Bolt        | MOBIDROM Bolt Köln-Bonn (needs auth)                                          | Combined Köln+Bonn dataset, filtered to a Cologne bounding box                                            |
-| Dott        | `cologne` (ridedott.com)                                                      | Cologne-only, free-floating                                                                               |
-| Ryde, TIER  | –                                                                             | No known public feed for Cologne yet; reported as unavailable                                             |
-| Lime        | –                                                                             | MOBIDROM's `lime-nrw` dataset exists but only covers Dortmund/Essen, not Cologne; reported as unavailable |
+| Dott        | `cologne` (ridedott.com)                                                      | Cologne-only, free-floating; includes vehicles formerly branded TIER                                     |
+| Ryde        | –                                                                             | No verified public feed for Cologne; reported as unavailable                                              |
+| Lime        | –                                                                             | MOBIDROM lists Dortmund, Essen and bundled NRW data, but no verified Cologne feed URL; unavailable here  |
 | RideMovi    | –                                                                             | No known public feed for Cologne yet; reported as unavailable                                             |
 
 Results are cached in `api/cache/gbfs_cache.json` for two minutes (`CACHE_TTL_SECONDS` in `api/lib/cache.php`) to avoid
